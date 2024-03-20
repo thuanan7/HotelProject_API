@@ -1,6 +1,7 @@
 using HotelProject_HotelAPI;
 using HotelProject_HotelAPI.Controllers;
 using HotelProject_HotelAPI.Repository;
+using HotelProject_HotelAPI.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
