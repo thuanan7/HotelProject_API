@@ -1,5 +1,6 @@
 using HotelProject_HotelAPI;
 using HotelProject_HotelAPI.Controllers;
+using HotelProject_HotelAPI.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 {
     option.UseSqlServer(builder.Configuration.GetConnectionString("HotelProjectDatabase"));
 });
+
+builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 

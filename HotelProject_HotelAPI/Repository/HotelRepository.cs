@@ -12,7 +12,7 @@ namespace HotelProject_HotelAPI.Repository
         {
             _context = context;
         }
-        public async Task<List<Hotel>> GetAll(Expression<Func<Hotel, bool>>? filter = null)
+        public async Task<List<Hotel>> GetAllAsync(Expression<Func<Hotel, bool>>? filter = null)
         {
             IQueryable<Hotel> query = _context.Hotels;
             if (filter != null)
@@ -22,7 +22,7 @@ namespace HotelProject_HotelAPI.Repository
             return await query.ToListAsync();
         }
 
-        public async Task<Hotel> Get(Expression<Func<Hotel, bool>>? filter = null, bool tracked = true)
+        public async Task<Hotel> GetAsync(Expression<Func<Hotel, bool>>? filter = null, bool tracked = true)
         {
             IQueryable<Hotel> query = _context.Hotels;
             if (filter != null)
@@ -38,25 +38,25 @@ namespace HotelProject_HotelAPI.Repository
 
         
 
-        public async Task Create(Hotel entity)
+        public async Task CreateAsync(Hotel entity)
         {
             await _context.AddAsync(entity);
-            await Save();
+            await SaveAsync();
         }
 
-        public async Task Remove(Hotel entity)
+        public async Task RemoveAsync(Hotel entity)
         {
             _context.Remove(entity);
-            await Save();
+            await SaveAsync();
         }
 
-        public async Task Update(Hotel entity)
+        public async Task UpdateAsync(Hotel entity)
         {
             _context.Update(entity);
-            await Save();
+            await SaveAsync();
         }
 
-        public async Task Save()
+        public async Task SaveAsync()
         {
             await _context.SaveChangesAsync();
         }

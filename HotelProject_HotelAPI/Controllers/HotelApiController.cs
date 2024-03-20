@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using HotelProject_HotelAPI.DTO;
 using HotelProject_HotelAPI.Models;
+using HotelProject_HotelAPI.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Xml.Linq;
@@ -11,9 +12,9 @@ namespace HotelProject_HotelAPI.Controllers
     [ApiController]
     public class HotelApiController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IHotelRepository _context;
         private readonly IMapper _mapper;
-        public HotelApiController(ApplicationDbContext context, IMapper mapper)
+        public HotelApiController(IHotelRepository context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -23,7 +24,7 @@ namespace HotelProject_HotelAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<HotelDTO>>> GetHotels()
         {
-            var hotels = await _context.Hotels.ToListAsync();
+            var hotels = await _context.GetAllAsync();
             return Ok(_mapper.Map<List<HotelDTO>>(hotels));
         }
 
@@ -32,7 +33,7 @@ namespace HotelProject_HotelAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<HotelDTO>> GetHotel(int id)
         {
-            var hotel = await _context.Hotels.FirstOrDefaultAsync(h => h.Id == id);
+            var hotel = await _context.GetAsync(h => h.Id == id);
             if (hotel == null)
             {
                 return NotFound();
@@ -48,25 +49,14 @@ namespace HotelProject_HotelAPI.Controllers
             if (CreateHotelDTO == null)
                 return BadRequest();
 
-            if (await _context.Hotels.FirstOrDefaultAsync(u => u.Name.ToLower() == CreateHotelDTO.Name.ToLower()) != null)
+            if (await _context.GetAsync(u => u.Name.ToLower() == CreateHotelDTO.Name.ToLower()) != null)
             {
                 ModelState.AddModelError("NameUsedError", "Name Already Exists!");
                 return BadRequest(ModelState);
             }
 
-
-            //var hotel = new Hotel
-            //{
-            //    Name = CreateHotelDTO.Name,
-            //    Description = CreateHotelDTO.Description,
-            //    Occupancy = CreateHotelDTO.Occupancy,
-            //    Size = CreateHotelDTO.Size,
-            //    Price = CreateHotelDTO.Price,
-            //    Amenity = CreateHotelDTO.Amenity,
-            //};
             var hotel = _mapper.Map<Hotel>(CreateHotelDTO);
-            await _context.Hotels.AddAsync(hotel);
-            await _context.SaveChangesAsync();
+            await _context.CreateAsync(hotel);
             return CreatedAtRoute("GetHotel", new { id = hotel.Id }, _mapper.Map<HotelDTO>(hotel));
         }
 
@@ -75,13 +65,12 @@ namespace HotelProject_HotelAPI.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DeleteHotel(int id)
         {
-            var hotel = await _context.Hotels.FirstOrDefaultAsync(h => h.Id == id);
+            var hotel = await _context.GetAsync(h => h.Id == id);
             if (hotel == null)
             {
                 return NotFound();
             }
-            _context.Hotels.Remove(hotel);
-            await _context.SaveChangesAsync();
+            await _context.RemoveAsync(hotel);
             return NoContent();
         }
 
@@ -94,19 +83,18 @@ namespace HotelProject_HotelAPI.Controllers
             if (hotelDTO == null || hotelDTO.Id != id)
                 return BadRequest();
 
-            var hotel = await _context.Hotels.AsNoTracking().FirstOrDefaultAsync(h => h.Id == id);
+            var hotel = await _context.GetAsync(h => h.Id == id, tracked:false);
             if (hotel == null)
                 return NotFound();
 
-            if (await _context.Hotels.FirstOrDefaultAsync(u => u.Name.ToLower() == hotelDTO.Name.ToLower()) != null)
+            if (await _context.GetAsync(u => u.Name.ToLower() == hotelDTO.Name.ToLower()) != null)
             {
                 ModelState.AddModelError("NameUsedError", "Name Already Exists!");
                 return BadRequest(ModelState);
             }
 
             var model = _mapper.Map<Hotel>(hotelDTO);
-            _context.Update(model);
-            await _context.SaveChangesAsync();
+            await _context.UpdateAsync(model);
             return NoContent();
         }
     }
