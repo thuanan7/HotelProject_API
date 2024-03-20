@@ -1,5 +1,4 @@
-﻿using HotelProject_HotelAPI.Data;
-using HotelProject_HotelAPI.DTO;
+﻿using HotelProject_HotelAPI.DTO;
 using HotelProject_HotelAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Xml.Linq;
@@ -10,11 +9,17 @@ namespace HotelProject_HotelAPI.Controllers
     [ApiController]
     public class HotelApiController : ControllerBase
     {
+        private readonly ApplicationDbContext _context;
+        public HotelApiController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<HotelDTO>> GetHotels()
         {
-            return Ok(HotelStore.hotelList);
+            return Ok(_context.Hotels);
         }
 
         [HttpGet("{id:int}", Name = "GetHotel")]
@@ -22,7 +27,7 @@ namespace HotelProject_HotelAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<HotelDTO> GetHotel(int id)
         {
-            var hotel = HotelStore.hotelList.FirstOrDefault(h => h.Id == id);
+            var hotel = _context.Hotels.FirstOrDefault(h => h.Id == id);
             if (hotel == null)
             {
                 return NotFound();
@@ -33,21 +38,31 @@ namespace HotelProject_HotelAPI.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<HotelDTO> CreateHotel([FromBody] HotelDTO hotel)
+        public ActionResult<HotelDTO> CreateHotel([FromBody] HotelDTO hotelDTO)
         {
-            if (hotel == null || hotel.Id != 0)
+            if (hotelDTO == null || hotelDTO.Id != 0)
                 return BadRequest();
 
-            if (HotelStore.hotelList.FirstOrDefault(u => u.Name.ToLower() == hotel.Name.ToLower()) != null)
+            if (_context.Hotels.FirstOrDefault(u => u.Name.ToLower() == hotelDTO.Name.ToLower()) != null)
             {
                 ModelState.AddModelError("NameUsedError", "Name Already Exists!");
                 return BadRequest(ModelState);
             }
 
-            hotel.Id = HotelStore.hotelList.OrderByDescending(h => h.Id).FirstOrDefault().Id + 1;
 
-            HotelStore.hotelList.Add(hotel);
-            return CreatedAtRoute("GetHotel", new { id = hotel.Id }, hotel);
+            var hotel = new Hotel
+            {
+                Name = hotelDTO.Name,
+                Description = hotelDTO.Description,
+                Occupancy = hotelDTO.Occupancy,
+                Size = hotelDTO.Size,
+                Price = hotelDTO.Price,
+                Amenity = hotelDTO.Amenity,
+            };
+            _context.Hotels.Add(hotel);
+            _context.SaveChanges();
+            hotelDTO.Id = hotel.Id;
+            return CreatedAtRoute("GetHotel", new { id = hotel.Id }, hotelDTO);
         }
 
         [HttpDelete("{id:int}")]
@@ -55,12 +70,13 @@ namespace HotelProject_HotelAPI.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public IActionResult DeleteHotel(int id)
         {
-            var hotel = HotelStore.hotelList.FirstOrDefault(h => h.Id == id);
+            var hotel = _context.Hotels.FirstOrDefault(h => h.Id == id);
             if (hotel == null)
             {
                 return NotFound();
             }
-            HotelStore.hotelList.Remove(hotel);
+            _context.Hotels.Remove(hotel);
+            _context.SaveChanges();
             return NoContent();
         }
 
@@ -73,19 +89,23 @@ namespace HotelProject_HotelAPI.Controllers
             if (hotelDTO == null || hotelDTO.Id != id)
                 return BadRequest();
 
-            var hotel = HotelStore.hotelList.FirstOrDefault(h=>h.Id == id);
+            var hotel = _context.Hotels.FirstOrDefault(h => h.Id == id);
             if (hotel == null)
                 return NotFound();
 
-            if (HotelStore.hotelList.FirstOrDefault(u => u.Name.ToLower() == hotelDTO.Name.ToLower()) != null)
+            if (_context.Hotels.FirstOrDefault(u => u.Name.ToLower() == hotelDTO.Name.ToLower()) != null)
             {
                 ModelState.AddModelError("NameUsedError", "Name Already Exists!");
                 return BadRequest(ModelState);
             }
 
             hotel.Name = hotelDTO.Name;
+            hotel.Description = hotelDTO.Description;
             hotel.Occupancy = hotelDTO.Occupancy;
             hotel.Size = hotelDTO.Size;
+            hotel.Price = hotelDTO.Price;
+            hotel.Amenity = hotelDTO.Amenity;
+            _context.SaveChanges();
             return NoContent();
         }
     }

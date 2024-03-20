@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HotelProject_HotelAPI.Controllers
 {
-    public class AplicationDbContext : DbContext
+    public class ApplicationDbContext : DbContext
     {
-        public AplicationDbContext(DbContextOptions<AplicationDbContext> options) : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
         public DbSet<Hotel> Hotels { get; set; }
