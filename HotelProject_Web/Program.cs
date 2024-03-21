@@ -1,4 +1,6 @@
 using HotelProject_Web;
+using HotelProject_Web.Services;
+using HotelProject_Web.Services.IServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+builder.Services.AddHttpClient<IHotelService, HotelService>();
+builder.Services.AddScoped<IHotelService, HotelService>();
 
 var app = builder.Build();
 
