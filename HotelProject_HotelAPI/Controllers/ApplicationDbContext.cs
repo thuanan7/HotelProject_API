@@ -9,6 +9,7 @@ namespace HotelProject_HotelAPI.Controllers
         {
         }
         public DbSet<Hotel> Hotels { get; set; }
+        public DbSet<HotelRoom> HotelRooms { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
