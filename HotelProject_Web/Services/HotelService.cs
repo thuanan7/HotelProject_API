@@ -50,13 +50,13 @@ namespace HotelProject_Web.Services
             });
         }
 
-        public Task<T> UpdateAsync<T>(int id, HotelDTO dto)
+        public Task<T> UpdateAsync<T>(HotelDTO dto)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.PUT,
                 Data = dto,
-                Url = hotelApiUrl + $"/api/HotelApi/{id}"
+                Url = hotelApiUrl + $"/api/HotelApi/{dto.Id}"
             });
         }
     }

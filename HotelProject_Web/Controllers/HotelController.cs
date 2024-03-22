@@ -48,5 +48,31 @@ namespace HotelProject_Web.Controllers
             }
             return View(model);
         }
+
+        public async Task<IActionResult> UpdateHotel(int HotelId)
+        {
+            var response = await _hotelService.GetAsync<APIResponse>(HotelId);
+            if (response != null && response.IsSuccess)
+            {
+                HotelDTO model = JsonConvert.DeserializeObject<HotelDTO>(Convert.ToString(response.Result));
+                return View(model);
+            }
+            return NotFound();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateHotel(HotelDTO model)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _hotelService.UpdateAsync<APIResponse>(model);
+                if (response != null && response.IsSuccess)
+                {
+                    return RedirectToAction(nameof(IndexHotel));
+                }
+            }
+            return View(model);
+        }
     }
 }
