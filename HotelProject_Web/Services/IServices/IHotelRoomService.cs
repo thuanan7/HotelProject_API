@@ -2,12 +2,12 @@
 
 namespace HotelProject_Web.Services.IServices
 {
-    public interface IHotelService
+    public interface IHotelRoomService
     {
         Task<T> GetALlAsync<T>();
-        Task<T> GetAsync<T>(int id);
-        Task<T> CreateAsync<T>(CreateHotelDTO dto);
-        Task<T> UpdateAsync<T>(HotelDTO dto);
-        Task<T> DeleteAsync<T>(int id);
+        Task<T> GetAsync<T>(int hotelId, int roomNo);
+        Task<T> CreateAsync<T>(CreateHotelRoomDTO dto);
+        Task<T> UpdateAsync<T>(HotelRoomDTO dto);
+        Task<T> DeleteAsync<T>(int hotelId, int roomNo);
     }
 }

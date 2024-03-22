@@ -12,5 +12,6 @@ namespace HotelProject_HotelAPI.DTO
         [Required]
         public int HotelId { get; set; }
         public string SpeacialDetails { get; set; }
+        public HotelDTO Hotel { get; set; }
     }
 }

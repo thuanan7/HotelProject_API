@@ -12,6 +12,9 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddHttpClient<IHotelService, HotelService>();
 builder.Services.AddScoped<IHotelService, HotelService>();
 
+builder.Services.AddHttpClient<IHotelRoomService, HotelRoomService>();
+builder.Services.AddScoped<IHotelRoomService, HotelRoomService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

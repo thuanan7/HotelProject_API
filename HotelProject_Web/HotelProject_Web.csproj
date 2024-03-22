@@ -15,4 +15,8 @@
     <ProjectReference Include="..\HotelProject_Utility\HotelProject_Utility.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\images\" />
+  </ItemGroup>
+
 </Project>

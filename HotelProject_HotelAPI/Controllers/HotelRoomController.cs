@@ -32,7 +32,7 @@ namespace HotelProject_HotelAPI.Controllers
         {
             try
             {
-                var hotelRooms = await _context.GetAllAsync();
+                var hotelRooms = await _context.GetAllAsync(includeProperties:"Hotel");
                 _response.Result = _mapper.Map<List<HotelRoomDTO>>(hotelRooms);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
