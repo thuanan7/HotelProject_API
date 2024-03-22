@@ -17,7 +17,7 @@ namespace HotelProject_Web.Controllers
             _hotelService = hotelService;
             _mapper = mapper;
         }
-        
+
         public async Task<IActionResult> IndexHotel()
         {
             List<HotelDTO> list = new();
@@ -71,6 +71,30 @@ namespace HotelProject_Web.Controllers
                 {
                     return RedirectToAction(nameof(IndexHotel));
                 }
+            }
+            return View(model);
+        }
+
+        public async Task<IActionResult> DeleteHotel(int HotelId)
+        {
+            var response = await _hotelService.GetAsync<APIResponse>(HotelId);
+            if (response != null && response.IsSuccess)
+            {
+                HotelDTO model = JsonConvert.DeserializeObject<HotelDTO>(Convert.ToString(response.Result));
+                return View(model);
+            }
+            return NotFound();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteHotel(HotelDTO model)
+        {
+
+            var response = await _hotelService.DeleteAsync<APIResponse>(model.Id);
+            if (response != null && response.IsSuccess)
+            {
+                return RedirectToAction(nameof(IndexHotel));
             }
             return View(model);
         }

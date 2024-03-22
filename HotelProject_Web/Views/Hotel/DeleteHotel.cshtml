@@ -1,6 +1,6 @@
 ﻿@model HotelProject_Web.DTO.HotelDTO
 
-<form asp-action="UpdateHotel">
+<form asp-action="DeleteHotel">
     <br />
     <div class="container border p-3">
         <h1 class="text-primary">Update Hotel</h1>
@@ -8,67 +8,59 @@
 
         <input hidden asp-for="Id" />
         <div class="row">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="col-2">
                 <label asp-for="Name" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
             <div class="col-10 pb-3">
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                <input asp-for="Name" disabled class="form-control" />
             </div>
 
             <div class="col-2">
                 <label asp-for="Price" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
             <div class="col-10 pb-3">
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
+                <input asp-for="Price" disabled class="form-control" />
             </div>
 
             <div class="col-2">
                 <label asp-for="Description" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
             <div class="col-10 pb-3">
-                <textarea asp-for="Description" class="form-control" rows="5" /></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
+                <textarea asp-for="Description" disabled class="form-control" rows="5" /></textarea>
             </div>
 
             <div class="col-2">
                 <label asp-for="Occupancy" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
             <div class="col-10 pb-3">
-                <input asp-for="Occupancy" class="form-control" />
-                <span asp-validation-for="Occupancy" class="text-danger"></span>
+                <input asp-for="Occupancy" disabled class="form-control" />
             </div>
 
             <div class="col-2">
                 <label asp-for="Size" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
             <div class="col-10 pb-3">
-                <input asp-for="Size" class="form-control" />
-                <span asp-validation-for="Size" class="text-danger"></span>
+                <input asp-for="Size" disabled class="form-control" />
             </div>
 
             <div class="col-2">
                 <label asp-for="Amenity" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
             <div class="col-10 pb-3">
-                <textarea asp-for="Amenity" class="form-control" /></textarea>
-                <span asp-validation-for="Amenity" class="text-danger"></span>
+                <textarea asp-for="Amenity" disabled class="form-control" /></textarea>
             </div>
 
             <div class="col-2">
                 <label asp-for="ImageUrl" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
             <div class="col-10 pb-3">
-                <input asp-for="ImageUrl" class="form-control" />
-                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                <input asp-for="ImageUrl" disabled class="form-control" />
             </div>
             <div class="col-5 offset-2">
                 <a asp-action="IndexHotel" asp-controller="Hotel" class="btn-primary btn form-control">Back to List</a>
             </div>
             <div class="col-5">
-                <input type="submit" value="Update" class="btn btn-success form-control" />
+                <input type="submit" value="Delete" class="btn btn-danger form-control" />
             </div>
         </div>
     </div>
