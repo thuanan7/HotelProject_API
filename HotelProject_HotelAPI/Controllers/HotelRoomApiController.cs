@@ -45,14 +45,14 @@ namespace HotelProject_HotelAPI.Controllers
             }
         }
 
-        [HttpGet("{roomNo:int}", Name = "GetHotelRoom")]
+        [HttpGet("hotels/{hotelId:int}/rooms/{roomNo}", Name = "GetHotelRoom")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<APIResponse>> GetHotelRoom(int roomNo)
+        public async Task<ActionResult<APIResponse>> GetHotelRoom(int hotelId, int roomNo)
         {
             try
             {
-                var hotelRoom = await _context.GetAsync(h => h.RoomNo == roomNo);
+                var hotelRoom = await _context.GetAsync(h => h.HotelId == hotelId && h.RoomNo == roomNo);
                 if (hotelRoom == null)
                 {
                     _response.StatusCode = HttpStatusCode.NotFound;
@@ -108,7 +108,7 @@ namespace HotelProject_HotelAPI.Controllers
 
             _response.StatusCode = HttpStatusCode.Created;
             _response.Result = _mapper.Map<HotelRoomDTO>(hotelRoom);
-            return CreatedAtRoute("GetHotelRoom", new { roomNo = hotelRoom.RoomNo }, _response);
+            return CreatedAtRoute("GetHotelRoom", new { hotelId = hotelRoom.HotelId, roomNo = hotelRoom.RoomNo }, _response);
         }
 
         [HttpDelete("hotels/{hotelId:int}/rooms/{roomNo}")]

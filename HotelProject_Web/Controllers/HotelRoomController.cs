@@ -81,13 +81,14 @@ namespace HotelProject_Web.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> UpdateRoomHotel(int hotelId, int roomNo)
+        public async Task<IActionResult> UpdateHotelRoom(int hotelId, int roomNo)
         {
             HotelRoomUpdateVM hotelRoomVM = new();
             var response = await _hotelRoomService.GetAsync<APIResponse>(hotelId, roomNo);
             if (response != null && response.IsSuccess)
             {
-                hotelRoomVM.UpdateHotelRoom = JsonConvert.DeserializeObject<UpdateHotelRoomDTO>(Convert.ToString(response.Result));
+                HotelRoomDTO model = JsonConvert.DeserializeObject<HotelRoomDTO>(Convert.ToString(response.Result));
+                hotelRoomVM.UpdateHotelRoom = _mapper.Map<UpdateHotelRoomDTO>(model);
             }
 
             
@@ -107,7 +108,7 @@ namespace HotelProject_Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateRoomHotel(HotelRoomUpdateVM model)
+        public async Task<IActionResult> UpdateHotelRoom(HotelRoomUpdateVM model)
         {
 
             if (ModelState.IsValid)
@@ -146,7 +147,21 @@ namespace HotelProject_Web.Controllers
             var response = await _hotelRoomService.GetAsync<APIResponse>(hotelId, roomNo);
             if (response != null && response.IsSuccess)
             {
-                hotelRoomVM.DeleteHotelRoom = JsonConvert.DeserializeObject<HotelRoomDTO>(Convert.ToString(response.Result));
+                HotelRoomDTO model = JsonConvert.DeserializeObject<HotelRoomDTO>(Convert.ToString(response.Result));
+                hotelRoomVM.DeleteHotelRoom = _mapper.Map<HotelRoomDTO>(model);
+            }
+
+
+            var hotelListResponse = await _hotelService.GetALlAsync<APIResponse>();
+            if (hotelListResponse != null && hotelListResponse.IsSuccess)
+            {
+                hotelRoomVM.HotelList = JsonConvert.DeserializeObject<List<HotelDTO>>
+                    (Convert.ToString(hotelListResponse.Result)).Select(i => new SelectListItem
+                    {
+                        Text = i.Name,
+                        Value = i.Id.ToString(),
+                    });
+                return View(hotelRoomVM);
             }
             return NotFound();
         }
