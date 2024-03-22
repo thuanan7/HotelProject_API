@@ -93,9 +93,9 @@ namespace HotelProject_HotelAPI.Controllers
                 return BadRequest(_response);
             }
 
-            if (await _context.GetAsync(u => u.HotelId == createHotelRoomDTO.HotelId && u.RoomNo == createHotelRoomDTO.RoomNo) != null)
+            if (await _context.GetAsync(u => u.HotelId == createHotelRoomDTO.HotelId && u.RoomNo == createHotelRoomDTO.RoomNo, tracked: false, includeProperties: "Hotel") != null)
             {
-                ModelState.AddModelError("RoomExistedError", $"Room {createHotelRoomDTO.RoomNo} in Hotel {createHotelRoomDTO.HotelId} Already Exists!");
+                ModelState.AddModelError("ErrorMessage", $"Room {createHotelRoomDTO.RoomNo} in Hotel {createHotelRoomDTO.HotelId} Already Exists!");
                 return BadRequest(ModelState);
             }
 

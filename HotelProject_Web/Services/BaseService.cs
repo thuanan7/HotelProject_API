@@ -46,9 +46,26 @@ namespace HotelProject_Web.Services
                         break;
                 }
                 HttpResponseMessage apiResponse = await client.SendAsync(message);
+
                 var apiContent = await apiResponse.Content.ReadAsStringAsync();
-                var APIResponse = JsonConvert.DeserializeObject<T>(apiContent);
-                return APIResponse;
+                try
+                {
+                    APIResponse APIResponse = JsonConvert.DeserializeObject<APIResponse>(apiContent);
+                    if (APIResponse.StatusCode == System.Net.HttpStatusCode.BadRequest
+                        || APIResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    {
+                        APIResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                        APIResponse.IsSuccess = false;
+                    }
+                    var res = JsonConvert.SerializeObject(APIResponse);
+                    var returnObj = JsonConvert.DeserializeObject<T>(res);
+                    return returnObj;
+                }
+                catch (Exception e)
+                {
+                    var exceptionResponse = JsonConvert.DeserializeObject<T>(apiContent);
+                    return exceptionResponse;
+                }
             }
             catch (Exception ex)
             {
