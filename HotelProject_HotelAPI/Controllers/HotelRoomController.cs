@@ -93,10 +93,13 @@ namespace HotelProject_HotelAPI.Controllers
                 return BadRequest(_response);
             }
 
-            if (await _context.GetAsync(u => u.HotelId == createHotelRoomDTO.HotelId && u.RoomNo == createHotelRoomDTO.RoomNo, tracked: false, includeProperties: "Hotel") != null)
+            var h = await _context.GetAsync(u => u.HotelId == createHotelRoomDTO.HotelId && u.RoomNo == createHotelRoomDTO.RoomNo, tracked: false, includeProperties: "Hotel");
+            if (h != null)
             {
-                ModelState.AddModelError("ErrorMessage", $"Room {createHotelRoomDTO.RoomNo} in Hotel {createHotelRoomDTO.HotelId} Already Exists!");
-                return BadRequest(ModelState);
+                _response.StatusCode = HttpStatusCode.BadRequest;
+                _response.ErrorMessage = $"Room {h.RoomNo} Already Exists in {h.Hotel.Name}!";
+                _response.IsSuccess = false;
+                return BadRequest(_response);
             }
 
             var hotelRoom = _mapper.Map<HotelRoom>(createHotelRoomDTO);
