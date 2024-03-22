@@ -4,6 +4,7 @@ using HotelProject_Web.Models;
 using HotelProject_Web.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace HotelProject_Web.Controllers
 {
@@ -16,6 +17,7 @@ namespace HotelProject_Web.Controllers
             _hotelService = hotelService;
             _mapper = mapper;
         }
+        
         public async Task<IActionResult> IndexHotel()
         {
             List<HotelDTO> list = new();
@@ -25,6 +27,26 @@ namespace HotelProject_Web.Controllers
                 list = JsonConvert.DeserializeObject<List<HotelDTO>>(Convert.ToString(response.Result));
             }
             return View(list);
+        }
+
+        public async Task<IActionResult> CreateHotel()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateHotel(CreateHotelDTO model)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _hotelService.CreateAsync<APIResponse>(model);
+                if (response != null && response.IsSuccess)
+                {
+                    return RedirectToAction(nameof(IndexHotel));
+                }
+            }
+            return View(model);
         }
     }
 }
