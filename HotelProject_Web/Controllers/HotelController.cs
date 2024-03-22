@@ -43,9 +43,11 @@ namespace HotelProject_Web.Controllers
                 var response = await _hotelService.CreateAsync<APIResponse>(model);
                 if (response != null && response.IsSuccess)
                 {
+                    TempData["success"] = "Hotel created successfully";
                     return RedirectToAction(nameof(IndexHotel));
                 }
             }
+            TempData["error"] = "Error: Something Wrong!";
             return View(model);
         }
 
@@ -57,6 +59,7 @@ namespace HotelProject_Web.Controllers
                 HotelDTO model = JsonConvert.DeserializeObject<HotelDTO>(Convert.ToString(response.Result));
                 return View(model);
             }
+            TempData["error"] = "Error: Something Wrong!";
             return NotFound();
         }
 
@@ -69,6 +72,7 @@ namespace HotelProject_Web.Controllers
                 var response = await _hotelService.UpdateAsync<APIResponse>(model);
                 if (response != null && response.IsSuccess)
                 {
+                    TempData["success"] = "Hotel Updated successfully";
                     return RedirectToAction(nameof(IndexHotel));
                 }
             }
@@ -94,8 +98,10 @@ namespace HotelProject_Web.Controllers
             var response = await _hotelService.DeleteAsync<APIResponse>(model.Id);
             if (response != null && response.IsSuccess)
             {
+                TempData["success"] = "Hotel deleted successfully";
                 return RedirectToAction(nameof(IndexHotel));
             }
+            TempData["error"] = "Error: Something Wrong!";
             return View(model);
         }
     }

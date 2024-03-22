@@ -56,12 +56,14 @@ namespace HotelProject_Web.Controllers
                 var response = await _hotelRoomService.CreateAsync<APIResponse>(model.CreateHotelRoom);
                 if (response != null && response.IsSuccess)
                 {
+                    TempData["success"] = "Hotel created successfully";
                     return RedirectToAction(nameof(IndexHotelRoom));
                 }
                 else
                 {
                     if (response.ErrorMessage != null)
                     {
+                        TempData["error"] = "Error: Something Wrong!";
                         ModelState.AddModelError("ErrorMessage", response.ErrorMessage);
                     }
                 }
@@ -116,12 +118,14 @@ namespace HotelProject_Web.Controllers
                 var response = await _hotelRoomService.UpdateAsync<APIResponse>(model.UpdateHotelRoom);
                 if (response != null && response.IsSuccess)
                 {
+                    TempData["success"] = "Hotel updated successfully";
                     return RedirectToAction(nameof(IndexHotelRoom));
                 }
                 else
                 {
                     if (response.ErrorMessage != null)
                     {
+                        TempData["error"] = "Error: Something Wrong!";
                         ModelState.AddModelError("ErrorMessage", response.ErrorMessage);
                     }
                 }
@@ -147,8 +151,7 @@ namespace HotelProject_Web.Controllers
             var response = await _hotelRoomService.GetAsync<APIResponse>(hotelId, roomNo);
             if (response != null && response.IsSuccess)
             {
-                HotelRoomDTO model = JsonConvert.DeserializeObject<HotelRoomDTO>(Convert.ToString(response.Result));
-                hotelRoomVM.DeleteHotelRoom = _mapper.Map<HotelRoomDTO>(model);
+                hotelRoomVM.DeleteHotelRoom = JsonConvert.DeserializeObject<HotelRoomDTO>(Convert.ToString(response.Result));
             }
 
 
@@ -163,6 +166,7 @@ namespace HotelProject_Web.Controllers
                     });
                 return View(hotelRoomVM);
             }
+            TempData["error"] = "Error: Something Wrong!";
             return NotFound();
         }
 
@@ -173,8 +177,10 @@ namespace HotelProject_Web.Controllers
             var response = await _hotelRoomService.DeleteAsync<APIResponse>(model.DeleteHotelRoom.HotelId, model.DeleteHotelRoom.RoomNo);
             if (response != null && response.IsSuccess)
             {
+                TempData["success"] = "Hotel deleted successfully";
                 return RedirectToAction(nameof(IndexHotelRoom));
             }
+            TempData["error"] = "Error: Something Wrong!";
             return View(model);
         }
     }
