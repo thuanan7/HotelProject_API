@@ -12,13 +12,13 @@ namespace HotelProject_HotelAPI.Controllers
 {
     [Route("/api/[controller]")]
     [ApiController]
-    public class HotelRoomController : ControllerBase
+    public class HotelRoomApiController : ControllerBase
     {
         private readonly IHotelRoomRepository _context;
         private readonly IHotelRepository _hoteldb;
         private readonly IMapper _mapper;
         private APIResponse _response;
-        public HotelRoomController(IHotelRoomRepository context, IMapper mapper, IHotelRepository hoteldb)
+        public HotelRoomApiController(IHotelRoomRepository context, IMapper mapper, IHotelRepository hoteldb)
         {
             _context = context;
             _mapper = mapper;

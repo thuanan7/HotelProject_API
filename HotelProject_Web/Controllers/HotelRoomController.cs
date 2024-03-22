@@ -81,54 +81,86 @@ namespace HotelProject_Web.Controllers
             return View(model);
         }
 
-        //public async Task<IActionResult> UpdateRoomHotel(int HotelId)
-        //{
-        //    var response = await _hotelRoomService.GetAsync<APIResponse>(HotelId);
-        //    if (response != null && response.IsSuccess)
-        //    {
-        //        HotelDTO model = JsonConvert.DeserializeObject<HotelDTO>(Convert.ToString(response.Result));
-        //        return View(model);
-        //    }
-        //    return NotFound();
-        //}
+        public async Task<IActionResult> UpdateRoomHotel(int hotelId, int roomNo)
+        {
+            HotelRoomUpdateVM hotelRoomVM = new();
+            var response = await _hotelRoomService.GetAsync<APIResponse>(hotelId, roomNo);
+            if (response != null && response.IsSuccess)
+            {
+                hotelRoomVM.UpdateHotelRoom = JsonConvert.DeserializeObject<UpdateHotelRoomDTO>(Convert.ToString(response.Result));
+            }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> UpdateRoomHotel(HotelRoomDTO model)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        var response = await _hotelRoomService.UpdateAsync<APIResponse>(model);
-        //        if (response != null && response.IsSuccess)
-        //        {
-        //            return RedirectToAction(nameof(IndexHotelRoom));
-        //        }
-        //    }
-        //    return View(model);
-        //}
+            
+            var hotelListResponse = await _hotelService.GetALlAsync<APIResponse>();
+            if (hotelListResponse != null && hotelListResponse.IsSuccess)
+            {
+                hotelRoomVM.HotelList = JsonConvert.DeserializeObject<List<HotelDTO>>
+                    (Convert.ToString(hotelListResponse.Result)).Select(i => new SelectListItem
+                    {
+                        Text = i.Name,
+                        Value = i.Id.ToString(),
+                    });
+                return View(hotelRoomVM);
+            }
+            return NotFound();
+        }
 
-        //public async Task<IActionResult> DeleteHotelRoom(int HotelId)
-        //{
-        //    var response = await _hotelRoomService.GetAsync<APIResponse>(HotelId);
-        //    if (response != null && response.IsSuccess)
-        //    {
-        //        HotelDTO model = JsonConvert.DeserializeObject<HotelDTO>(Convert.ToString(response.Result));
-        //        return View(model);
-        //    }
-        //    return NotFound();
-        //}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateRoomHotel(HotelRoomUpdateVM model)
+        {
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteHotelRoom(HotelRoomDTO model)
-        //{
+            if (ModelState.IsValid)
+            {
+                var response = await _hotelRoomService.UpdateAsync<APIResponse>(model.UpdateHotelRoom);
+                if (response != null && response.IsSuccess)
+                {
+                    return RedirectToAction(nameof(IndexHotelRoom));
+                }
+                else
+                {
+                    if (response.ErrorMessage != null)
+                    {
+                        ModelState.AddModelError("ErrorMessage", response.ErrorMessage);
+                    }
+                }
+            }
 
-        //    var response = await _hotelRoomService.DeleteAsync<APIResponse>(model.Id);
-        //    if (response != null && response.IsSuccess)
-        //    {
-        //        return RedirectToAction(nameof(IndexHotel));
-        //    }
-        //    return View(model);
-        //}
+
+            var res = await _hotelService.GetALlAsync<APIResponse>();
+            if (res != null && res.IsSuccess)
+            {
+                model.HotelList = JsonConvert.DeserializeObject<List<HotelDTO>>
+                    (Convert.ToString(res.Result)).Select(i => new SelectListItem
+                    {
+                        Text = i.Name,
+                        Value = i.Id.ToString(),
+                    });
+            }
+            return View(model);
+        }
+
+        public async Task<IActionResult> DeleteHotelRoom(int hotelId, int roomNo)
+        {
+            HotelRoomDeleteVM hotelRoomVM = new();
+            var response = await _hotelRoomService.GetAsync<APIResponse>(hotelId, roomNo);
+            if (response != null && response.IsSuccess)
+            {
+                hotelRoomVM.DeleteHotelRoom = JsonConvert.DeserializeObject<HotelRoomDTO>(Convert.ToString(response.Result));
+            }
+            return NotFound();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteHotelRoom(HotelRoomDeleteVM model)
+        {
+            var response = await _hotelRoomService.DeleteAsync<APIResponse>(model.DeleteHotelRoom.HotelId, model.DeleteHotelRoom.RoomNo);
+            if (response != null && response.IsSuccess)
+            {
+                return RedirectToAction(nameof(IndexHotelRoom));
+            }
+            return View(model);
+        }
     }
 }

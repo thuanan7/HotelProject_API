@@ -7,7 +7,7 @@ namespace HotelProject_Web.Services.IServices
         Task<T> GetALlAsync<T>();
         Task<T> GetAsync<T>(int hotelId, int roomNo);
         Task<T> CreateAsync<T>(CreateHotelRoomDTO dto);
-        Task<T> UpdateAsync<T>(HotelRoomDTO dto);
+        Task<T> UpdateAsync<T>(UpdateHotelRoomDTO dto);
         Task<T> DeleteAsync<T>(int hotelId, int roomNo);
     }
 }
