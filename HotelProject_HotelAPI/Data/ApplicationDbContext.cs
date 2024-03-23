@@ -1,7 +1,7 @@
 ﻿using HotelProject_HotelAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace HotelProject_HotelAPI.Controllers
+namespace HotelProject_HotelAPI.Data
 {
     public class ApplicationDbContext : DbContext
     {
@@ -10,6 +10,7 @@ namespace HotelProject_HotelAPI.Controllers
         }
         public DbSet<Hotel> Hotels { get; set; }
         public DbSet<HotelRoom> HotelRooms { get; set; }
+        public DbSet<LocalUser> LocalUser { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

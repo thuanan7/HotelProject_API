@@ -1,4 +1,4 @@
-﻿using HotelProject_HotelAPI.Controllers;
+﻿using HotelProject_HotelAPI.Data;
 using HotelProject_HotelAPI.Models;
 using HotelProject_HotelAPI.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;

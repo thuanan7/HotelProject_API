@@ -1,9 +1,9 @@
-﻿using HotelProject_HotelAPI.Controllers;
-using HotelProject_HotelAPI.Models;
+﻿using HotelProject_HotelAPI.Models;
 using HotelProject_HotelAPI.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Linq;
+using HotelProject_HotelAPI.Data;
 
 namespace HotelProject_HotelAPI.Repository
 {

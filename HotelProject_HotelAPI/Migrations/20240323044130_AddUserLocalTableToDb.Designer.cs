@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelProject_HotelAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240321040010_CreateHotelRoomTable")]
-    partial class CreateHotelRoomTable
+    [Migration("20240323044130_AddUserLocalTableToDb")]
+    partial class AddUserLocalTableToDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -71,7 +71,7 @@ namespace HotelProject_HotelAPI.Migrations
                         {
                             Id = 1,
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 3, 21, 11, 0, 10, 279, DateTimeKind.Local).AddTicks(5043),
+                            CreatedDate = new DateTime(2024, 3, 23, 11, 41, 29, 239, DateTimeKind.Local).AddTicks(6560),
                             Description = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                             ImageUrl = "https://dotnetmasteryimages.blob.core.windows.net/bluevillaimages/villa3.jpg",
                             Name = "Royal Hotel",
@@ -84,7 +84,7 @@ namespace HotelProject_HotelAPI.Migrations
                         {
                             Id = 2,
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 3, 21, 11, 0, 10, 279, DateTimeKind.Local).AddTicks(5056),
+                            CreatedDate = new DateTime(2024, 3, 23, 11, 41, 29, 239, DateTimeKind.Local).AddTicks(6574),
                             Description = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                             ImageUrl = "https://dotnetmasteryimages.blob.core.windows.net/bluevillaimages/villa1.jpg",
                             Name = "Premium Pool Hotel",
@@ -97,7 +97,7 @@ namespace HotelProject_HotelAPI.Migrations
                         {
                             Id = 3,
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 3, 21, 11, 0, 10, 279, DateTimeKind.Local).AddTicks(5058),
+                            CreatedDate = new DateTime(2024, 3, 23, 11, 41, 29, 239, DateTimeKind.Local).AddTicks(6575),
                             Description = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                             ImageUrl = "https://dotnetmasteryimages.blob.core.windows.net/bluevillaimages/villa4.jpg",
                             Name = "Luxury Pool Hotel",
@@ -110,7 +110,7 @@ namespace HotelProject_HotelAPI.Migrations
                         {
                             Id = 4,
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 3, 21, 11, 0, 10, 279, DateTimeKind.Local).AddTicks(5060),
+                            CreatedDate = new DateTime(2024, 3, 23, 11, 41, 29, 239, DateTimeKind.Local).AddTicks(6577),
                             Description = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                             ImageUrl = "https://dotnetmasteryimages.blob.core.windows.net/bluevillaimages/villa5.jpg",
                             Name = "Diamond Hotel",
@@ -123,7 +123,7 @@ namespace HotelProject_HotelAPI.Migrations
                         {
                             Id = 5,
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 3, 21, 11, 0, 10, 279, DateTimeKind.Local).AddTicks(5061),
+                            CreatedDate = new DateTime(2024, 3, 23, 11, 41, 29, 239, DateTimeKind.Local).AddTicks(6578),
                             Description = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                             ImageUrl = "https://dotnetmasteryimages.blob.core.windows.net/bluevillaimages/villa2.jpg",
                             Name = "Diamond Pool Hotel",
@@ -156,6 +156,31 @@ namespace HotelProject_HotelAPI.Migrations
                     b.HasIndex("HotelId");
 
                     b.ToTable("HotelRooms");
+                });
+
+            modelBuilder.Entity("HotelProject_HotelAPI.Models.LocalUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LocalUser");
                 });
 
             modelBuilder.Entity("HotelProject_HotelAPI.Models.HotelRoom", b =>
