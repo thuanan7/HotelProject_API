@@ -14,6 +14,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 
 builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddScoped<IHotelRoomRepository, HotelRoomRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
