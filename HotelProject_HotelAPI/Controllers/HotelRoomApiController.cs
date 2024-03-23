@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Azure;
-using HotelProject_HotelAPI.DTO;
 using HotelProject_HotelAPI.Models;
+using HotelProject_HotelAPI.Models.DTO;
 using HotelProject_HotelAPI.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

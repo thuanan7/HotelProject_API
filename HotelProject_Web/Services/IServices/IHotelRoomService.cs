@@ -1,4 +1,4 @@
-﻿using HotelProject_Web.DTO;
+﻿using HotelProject_Web.Models.DTO;
 
 namespace HotelProject_Web.Services.IServices
 {

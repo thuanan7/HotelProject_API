@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using HotelProject_Web.DTO;
 using HotelProject_Web.Models;
+using HotelProject_Web.Models.DTO;
 using HotelProject_Web.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -46,6 +46,14 @@ namespace HotelProject_Web.Controllers
                     TempData["success"] = "Hotel created successfully";
                     return RedirectToAction(nameof(IndexHotel));
                 }
+                else
+                {
+                    if (response.ErrorMessage != null)
+                    {
+                        TempData["error"] = "Error: Something Wrong!";
+                        ModelState.AddModelError("ErrorMessage", response.ErrorMessage);
+                    }
+                }
             }
             TempData["error"] = "Error: Something Wrong!";
             return View(model);
@@ -75,6 +83,14 @@ namespace HotelProject_Web.Controllers
                     TempData["success"] = "Hotel Updated successfully";
                     return RedirectToAction(nameof(IndexHotel));
                 }
+                else
+                {
+                    if (response.ErrorMessage != null)
+                    {
+                        TempData["error"] = "Error: Something Wrong!";
+                        ModelState.AddModelError("ErrorMessage", response.ErrorMessage);
+                    }
+                }
             }
             return View(model);
         }
@@ -87,6 +103,7 @@ namespace HotelProject_Web.Controllers
                 HotelDTO model = JsonConvert.DeserializeObject<HotelDTO>(Convert.ToString(response.Result));
                 return View(model);
             }
+            TempData["error"] = "Error: Something Wrong!";
             return NotFound();
         }
 

@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace HotelProject_Web.DTO
+namespace HotelProject_HotelAPI.Models.DTO
 {
-    public class HotelDTO
+    public class CreateHotelDTO
     {
-        public int Id { get; set; }
         [Required]
         [StringLength(50, MinimumLength = 3)]
         public string Name { get; set; }

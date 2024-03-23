@@ -1,4 +1,4 @@
-﻿using HotelProject_Web.DTO;
+﻿using HotelProject_Web.Models.DTO;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.Rendering;
 

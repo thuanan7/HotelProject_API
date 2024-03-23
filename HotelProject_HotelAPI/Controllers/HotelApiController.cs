@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Azure;
-using HotelProject_HotelAPI.DTO;
 using HotelProject_HotelAPI.Models;
+using HotelProject_HotelAPI.Models.DTO;
 using HotelProject_HotelAPI.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -141,10 +141,12 @@ namespace HotelProject_HotelAPI.Controllers
                 return NotFound(_response);
             }
 
-            if (await _context.GetAsync(u => u.Name.ToLower() == hotelDTO.Name.ToLower()) != null)
+            if (await _context.GetAsync(u => u.Id != id && u.Name.ToLower() == hotelDTO.Name.ToLower()) != null)
             {
-                ModelState.AddModelError("NameUsedError", "Name Already Exists!");
-                return BadRequest(ModelState);
+                _response.StatusCode = HttpStatusCode.BadRequest;
+                _response.ErrorMessage = "Name Already Exists!";
+                _response.IsSuccess = false;
+                return BadRequest(_response);
             }
 
             var model = _mapper.Map<Hotel>(hotelDTO);

@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HotelProject_HotelAPI.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace HotelProject_Web.DTO
+namespace HotelProject_HotelAPI.Models.DTO
 {
-    public class UpdateHotelRoomDTO
+    public class HotelRoomDTO
     {
         [Required]
         [Range(1, 1000, ErrorMessage = "HotelNo not valid")]
@@ -11,5 +12,6 @@ namespace HotelProject_Web.DTO
         [Required]
         public int HotelId { get; set; }
         public string SpeacialDetails { get; set; }
+        public HotelDTO Hotel { get; set; }
     }
 }

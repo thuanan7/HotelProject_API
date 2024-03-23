@@ -1,8 +1,7 @@
-﻿using HotelProject_HotelAPI.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace HotelProject_HotelAPI.DTO
+namespace HotelProject_Web.Models.DTO
 {
     public class CreateHotelRoomDTO
     {

@@ -1,6 +1,6 @@
 using AutoMapper;
-using HotelProject_Web.DTO;
 using HotelProject_Web.Models;
+using HotelProject_Web.Models.DTO;
 using HotelProject_Web.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;

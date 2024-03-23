@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using HotelProject_HotelAPI.DTO;
 using HotelProject_HotelAPI.Models;
+using HotelProject_HotelAPI.Models.DTO;
 
 namespace HotelProject_HotelAPI
 {
