@@ -15,6 +15,9 @@ builder.Services.AddScoped<IHotelService, HotelService>();
 builder.Services.AddHttpClient<IHotelRoomService, HotelRoomService>();
 builder.Services.AddScoped<IHotelRoomService, HotelRoomService>();
 
+builder.Services.AddHttpClient<IAuthService, AuthService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
