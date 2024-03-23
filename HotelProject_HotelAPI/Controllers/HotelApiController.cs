@@ -45,6 +45,7 @@ namespace HotelProject_HotelAPI.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetHotel")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> GetHotel(int id)
@@ -74,6 +75,8 @@ namespace HotelProject_HotelAPI.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<APIResponse>> CreateHotel([FromBody] CreateHotelDTO CreateHotelDTO)
         {
             if (CreateHotelDTO == null)
@@ -103,6 +106,8 @@ namespace HotelProject_HotelAPI.Controllers
         [Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<APIResponse>> DeleteHotel(int id)
         {
@@ -122,6 +127,8 @@ namespace HotelProject_HotelAPI.Controllers
         [HttpPut("{id}")]
         [Authorize(Roles = "custom")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status200OK)]
