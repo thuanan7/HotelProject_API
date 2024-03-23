@@ -1,8 +1,11 @@
-﻿using HotelProject_Web.Models;
+﻿using HotelProject_Utility;
+using HotelProject_Web.Models;
 using HotelProject_Web.Models.DTO;
 using HotelProject_Web.Services;
 using HotelProject_Web.Services.IServices;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace HotelProject_Web.Controllers
 {
@@ -25,7 +28,18 @@ namespace HotelProject_Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginRequestDTO obj)
         {
-            return View();
+            APIResponse response = await _authService.LoginAsync<APIResponse>(obj);
+            if (response != null && response.IsSuccess)
+            {
+                LoginResponseDTO model = JsonConvert.DeserializeObject<LoginResponseDTO>(Convert.ToString(response.Result));
+                HttpContext.Session.SetString(SD.SessionToken, model.Token);
+                return RedirectToAction("Index", "Home");
+            }
+
+            TempData["error"] = "Error: Something Wrong!";
+            ModelState.AddModelError("ErrorMessage", response.ErrorMessage);
+            obj.Password = "";
+            return View(obj);
         }
 
         [HttpGet]
@@ -41,23 +55,25 @@ namespace HotelProject_Web.Controllers
             var response = await _authService.RegisterAsync<APIResponse>(obj);
             if (response != null && response.IsSuccess)
             {
-                TempData["success"] = "Hotel created successfully";
+                TempData["success"] = "Register successfully";
                 return RedirectToAction(nameof(Login));
             }
-            else
+
+
+            if (response.ErrorMessage != null)
             {
-                if (response.ErrorMessage != null)
-                {
-                    TempData["error"] = "Error: Something Wrong!";
-                    ModelState.AddModelError("ErrorMessage", response.ErrorMessage);
-                }
+                TempData["error"] = "Error: Something Wrong!";
+                ModelState.AddModelError("ErrorMessage", response.ErrorMessage);
             }
-            return View();
+            obj.Password = "";
+            return View(obj);
         }
 
         public async Task<IActionResult> Logout()
         {
-            return View();
+            await HttpContext.SignOutAsync();
+            ModelState.AddModelError("ErrorMessage", "");
+            return RedirectToAction("Index", "Home");
         }
 
         public IActionResult AccessDenied()
