@@ -1,4 +1,5 @@
 using AutoMapper;
+using HotelProject_Utility;
 using HotelProject_Web.Models;
 using HotelProject_Web.Models.DTO;
 using HotelProject_Web.Services.IServices;
@@ -21,7 +22,7 @@ namespace HotelProject_Web.Controllers
         public async Task<IActionResult> Index()
         {
             List<HotelDTO> list = new();
-            var response = await _hotelService.GetALlAsync<APIResponse>();
+            var response = await _hotelService.GetALlAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 list = JsonConvert.DeserializeObject<List<HotelDTO>>(Convert.ToString(response.Result));

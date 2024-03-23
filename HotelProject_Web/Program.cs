@@ -1,6 +1,7 @@
 using HotelProject_Web;
 using HotelProject_Web.Services;
 using HotelProject_Web.Services.IServices;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddHttpClient<IHotelService, HotelService>();
 builder.Services.AddScoped<IHotelService, HotelService>();
@@ -17,6 +20,16 @@ builder.Services.AddScoped<IHotelRoomService, HotelRoomService>();
 
 builder.Services.AddHttpClient<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+       .AddCookie(options =>
+       {
+           options.Cookie.HttpOnly = true;
+           options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+           options.SlidingExpiration = true;
+           options.LoginPath = "/Auth/Login";
+           options.AccessDeniedPath = "/Auth/AccessDenied";
+       });
 
 builder.Services.AddSession(options =>
 {
@@ -39,7 +52,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
 app.MapControllerRoute(

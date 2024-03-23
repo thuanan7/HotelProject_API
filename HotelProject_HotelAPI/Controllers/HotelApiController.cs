@@ -26,7 +26,6 @@ namespace HotelProject_HotelAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "admin")]
         public async Task<ActionResult<APIResponse>> GetHotels()
         {
             try
@@ -45,7 +44,6 @@ namespace HotelProject_HotelAPI.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetHotel")]
-        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> GetHotel(int id)
@@ -73,6 +71,7 @@ namespace HotelProject_HotelAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -125,7 +124,7 @@ namespace HotelProject_HotelAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "custom")]
+        [Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

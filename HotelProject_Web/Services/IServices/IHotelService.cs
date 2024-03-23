@@ -4,10 +4,10 @@ namespace HotelProject_Web.Services.IServices
 {
     public interface IHotelService
     {
-        Task<T> GetALlAsync<T>();
-        Task<T> GetAsync<T>(int id);
-        Task<T> CreateAsync<T>(CreateHotelDTO dto);
-        Task<T> UpdateAsync<T>(HotelDTO dto);
-        Task<T> DeleteAsync<T>(int id);
+        Task<T> GetALlAsync<T>(string token);
+        Task<T> GetAsync<T>(int id, string token);
+        Task<T> CreateAsync<T>(CreateHotelDTO dto, string token);
+        Task<T> UpdateAsync<T>(HotelDTO dto, string token);
+        Task<T> DeleteAsync<T>(int id, string token);
     }
 }

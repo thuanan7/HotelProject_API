@@ -13,50 +13,55 @@ namespace HotelProject_Web.Services
             hotelApiUrl = configuration.GetValue<string>("ServiceUrls:HotelProjectAPI");
         }
 
-        public Task<T> CreateAsync<T>(CreateHotelDTO dto)
+        public Task<T> CreateAsync<T>(CreateHotelDTO dto, string token)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.POST,
                 Data = dto,
-                Url = hotelApiUrl + "/api/HotelApi"
+                Url = hotelApiUrl + "/api/HotelApi",
+                Token = token
             });
         }
 
-        public Task<T> DeleteAsync<T>(int id)
+        public Task<T> DeleteAsync<T>(int id, string token)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.DELETE,
-                Url = hotelApiUrl + $"/api/HotelApi/{id}"
+                Url = hotelApiUrl + $"/api/HotelApi/{id}",
+                Token = token
             });
         }
 
-        public Task<T> GetALlAsync<T>()
+        public Task<T> GetALlAsync<T>(string token)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
-                Url = hotelApiUrl + "/api/HotelApi"
+                Url = hotelApiUrl + "/api/HotelApi",
+                Token = token
             });
         }
 
-        public Task<T> GetAsync<T>(int id)
+        public Task<T> GetAsync<T>(int id, string token)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
-                Url = hotelApiUrl + $"/api/HotelApi/{id}"
+                Url = hotelApiUrl + $"/api/HotelApi/{id}",
+                Token = token
             });
         }
 
-        public Task<T> UpdateAsync<T>(HotelDTO dto)
+        public Task<T> UpdateAsync<T>(HotelDTO dto, string token)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.PUT,
                 Data = dto,
-                Url = hotelApiUrl + $"/api/HotelApi/{dto.Id}"
+                Url = hotelApiUrl + $"/api/HotelApi/{dto.Id}",
+                Token = token
             });
         }
     }

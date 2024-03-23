@@ -2,8 +2,8 @@
 using HotelProject_Web.Models;
 using HotelProject_Web.Services.IServices;
 using Newtonsoft.Json;
-using System;
 using System.Text;
+using System.Net.Http.Headers;
 
 namespace HotelProject_Web.Services
 {
@@ -45,13 +45,26 @@ namespace HotelProject_Web.Services
                         message.Method = HttpMethod.Get;
                         break;
                 }
+
+                if (!string.IsNullOrEmpty(apiRequest.Token))
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiRequest.Token);
+                }
+
                 HttpResponseMessage apiResponse = await client.SendAsync(message);
 
                 var apiContent = await apiResponse.Content.ReadAsStringAsync();
                 try
                 {
                     APIResponse APIResponse = JsonConvert.DeserializeObject<APIResponse>(apiContent);
-                    if (APIResponse.StatusCode == System.Net.HttpStatusCode.BadRequest
+                    if (APIResponse == null) 
+                    {
+                        APIResponse = new APIResponse();
+                        APIResponse.ErrorMessage = "Error: Something Wrong!";
+                        APIResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                        APIResponse.IsSuccess = false;
+                    }
+                    else if (APIResponse.StatusCode == System.Net.HttpStatusCode.BadRequest
                         || APIResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
                     {
                         APIResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
