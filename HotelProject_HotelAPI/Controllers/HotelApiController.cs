@@ -3,6 +3,7 @@ using Azure;
 using HotelProject_HotelAPI.Models;
 using HotelProject_HotelAPI.Models.DTO;
 using HotelProject_HotelAPI.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -25,7 +26,7 @@ namespace HotelProject_HotelAPI.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<APIResponse>> GetHotels()
         {
             try
@@ -99,6 +100,7 @@ namespace HotelProject_HotelAPI.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -118,6 +120,7 @@ namespace HotelProject_HotelAPI.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "custom")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

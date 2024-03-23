@@ -19,7 +19,7 @@ namespace HotelProject_HotelAPI.Repository
         {
             _context = context;
             _mapper = mapper;
-            secretKey = configuration.GetValue<string>("ApiSettings:Sercret");
+            secretKey = configuration.GetValue<string>("ApiSettings:Secret");
         }
         public bool IsUniqueUser(string username)
         {
