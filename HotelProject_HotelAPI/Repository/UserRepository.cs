@@ -7,23 +7,30 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
+using System.Runtime.InteropServices;
 
 namespace HotelProject_HotelAPI.Repository
 {
     public class UserRepository : IUserRepository
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IMapper _mapper;
         private readonly string secretKey;
-        public UserRepository(ApplicationDbContext context, IMapper mapper, IConfiguration configuration)
+        public UserRepository(ApplicationDbContext context, IMapper mapper, IConfiguration configuration, 
+            UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
             _mapper = mapper;
             secretKey = configuration.GetValue<string>("ApiSettings:Secret");
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
         public bool IsUniqueUser(string username)
         {
-            var user = _context.LocalUser.FirstOrDefault(u=> u.UserName == username);
+            var user = _context.ApplicationUsers.FirstOrDefault(u=> u.UserName == username);
             if (user == null)
             {
                 return true;
@@ -33,9 +40,11 @@ namespace HotelProject_HotelAPI.Repository
 
         public async Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO)
         {
-            var user = _context.LocalUser.FirstOrDefault(u => u.UserName.ToLower() == loginRequestDTO.UserName.ToLower() 
-                                                            && u.Password.ToLower() == loginRequestDTO.Password.ToLower());
-            if (user == null)
+            var user = _context.ApplicationUsers.FirstOrDefault(u => u.UserName.ToLower() == loginRequestDTO.UserName.ToLower());
+
+            bool isValid = await _userManager.CheckPasswordAsync(user, loginRequestDTO.Password);
+
+            if (user == null || !isValid)
             {
                 return new LoginResponseDTO()
                 {
@@ -44,6 +53,7 @@ namespace HotelProject_HotelAPI.Repository
                 };
             }
             // gererate JWT Token
+            var roles = await _userManager.GetRolesAsync(user);
             var tokenHandle = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(secretKey);
 
@@ -52,7 +62,7 @@ namespace HotelProject_HotelAPI.Repository
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, user.Id.ToString()),
-                    new Claim(ClaimTypes.Role, user.Role)
+                    new Claim(ClaimTypes.Role, roles.FirstOrDefault())
                 }),
                 Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials= new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -62,18 +72,42 @@ namespace HotelProject_HotelAPI.Repository
             LoginResponseDTO loginResponseDTO = new()
             {
                 Token = tokenHandle.WriteToken(token),
-                User = user
+                User = _mapper.Map<UserDTO>(user),
+                Role = roles.FirstOrDefault(),
             };
             return loginResponseDTO;
         }
 
-        public async Task<LocalUser> Register(RegisterRequestDTO registerRequestDTO)
+        public async Task<UserDTO> Register(RegisterRequestDTO registerRequestDTO)
         {
-            LocalUser user = _mapper.Map<LocalUser>(registerRequestDTO);
-            await _context.LocalUser.AddAsync(user);
-            await _context.SaveChangesAsync();
-            user.Password = "";
-            return user;
+            ApplicationUser user = new()
+            {
+                UserName = registerRequestDTO.UserName,
+                Email = registerRequestDTO.UserName,
+                NormalizedEmail = registerRequestDTO.UserName.ToUpper(),
+                Name = registerRequestDTO.Name,
+            };
+            try
+            {
+                var result = await _userManager.CreateAsync(user, registerRequestDTO.Password);
+                if (result.Succeeded)
+                {
+                    if (!await _roleManager.RoleExistsAsync("admin"))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole("admin"));
+                        await _roleManager.CreateAsync(new IdentityRole("customer"));
+                    }
+                    await _userManager.AddToRoleAsync(user, "admin");
+                    var userToReturn = _context.ApplicationUsers.FirstOrDefault(u=>u.UserName== registerRequestDTO.UserName);
+                    return _mapper.Map<UserDTO>(userToReturn);
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return new UserDTO();
         }
     }
 }

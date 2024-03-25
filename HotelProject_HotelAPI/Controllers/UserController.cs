@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HotelProject_HotelAPI.Controllers
 {
-    [Route("/api/v{version:apiVersion}/[controller]")]
-    [ApiController]
     [ApiVersionNeutral]
+    [Route("/api/[Controller]")]
+    [ApiController]
     public class UserController : Controller
     {
         private readonly IUserRepository _userRepository;
@@ -47,7 +47,7 @@ namespace HotelProject_HotelAPI.Controllers
                 return BadRequest(_response);
             }
             var user = await _userRepository.Register(model);
-            if (user == null)
+            if (user.ID == null)
             {
                 _response.ErrorMessage = "Error while registering!";
                 _response.IsSuccess = false;
