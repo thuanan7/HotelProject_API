@@ -19,7 +19,7 @@ namespace HotelProject_Web.Services
             {
                 ApiType = SD.ApiType.POST,
                 Data = dto,
-                Url = hotelApiUrl + "/api/v1/HotelRoomApi",
+                Url = hotelApiUrl + $"/api/{SD.CurrentAPIVersion}/HotelRoomApi",
                 Token = token
             });
         }
@@ -29,7 +29,7 @@ namespace HotelProject_Web.Services
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.DELETE,
-                Url = hotelApiUrl + $"/api/v1/HotelRoomApi/hotels/{hotelId}/rooms/{roomNo}",
+                Url = hotelApiUrl + $"/api/{SD.CurrentAPIVersion}/HotelRoomApi/hotels/{hotelId}/rooms/{roomNo}",
                 Token = token
             });
         }
@@ -39,7 +39,7 @@ namespace HotelProject_Web.Services
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
-                Url = hotelApiUrl + "/api/v1/HotelRoomApi",
+                Url = hotelApiUrl + $"/api/{SD.CurrentAPIVersion}/HotelRoomApi",
                 Token = token
             });
         }
@@ -49,7 +49,7 @@ namespace HotelProject_Web.Services
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
-                Url = hotelApiUrl + $"/api/v1/HotelRoomApi/hotels/{hotelId}/rooms/{roomNo}",
+                Url = hotelApiUrl + $"/api/{SD.CurrentAPIVersion}/HotelRoomApi/hotels/{hotelId}/rooms/{roomNo}",
                 Token = token
             });
         }
@@ -60,7 +60,7 @@ namespace HotelProject_Web.Services
             {
                 ApiType = SD.ApiType.PUT,
                 Data = dto,
-                Url = hotelApiUrl + $"/api/v1/HotelRoomApi/hotels/{dto.HotelId}/rooms/{dto.RoomNo}",
+                Url = hotelApiUrl + $"/api/{SD.CurrentAPIVersion}/HotelRoomApi/hotels/{dto.HotelId}/rooms/{dto.RoomNo}",
                 Token = token
             });
         }
