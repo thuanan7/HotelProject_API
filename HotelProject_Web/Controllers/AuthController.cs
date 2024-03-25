@@ -6,6 +6,7 @@ using HotelProject_Web.Services.IServices;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -58,6 +59,13 @@ namespace HotelProject_Web.Controllers
         [HttpGet]
         public IActionResult Register()
         {
+            var test = new { Amount = 108, Message = "Hello" };
+            var roleSelectListItem = new List<SelectListItem>()
+            {
+                new SelectListItem{Text=SD.Role.Admin, Value=SD.Role.Admin},
+                new SelectListItem{Text=SD.Role.Customer, Value=SD.Role.Customer},
+            };
+            ViewBag.RoleSelectListItem = roleSelectListItem;
             return View();
         }
 

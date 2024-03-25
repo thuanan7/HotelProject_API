@@ -34,8 +34,11 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="HotelRoom" asp-action="IndexHotelRoom">Rooms</a>
                         </li>
 
+                        
+                    </ul>
+                    <ul class="navbar-nav">
                         @if (httpAccess.HttpContext.Session.GetString(SD.SessionToken) != null &&
-                                httpAccess.HttpContext.Session.GetString(SD.SessionToken).Length > 0)
+                        httpAccess.HttpContext.Session.GetString(SD.SessionToken).Length > 0)
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Auth" asp-action="Logout">Logout</a>
