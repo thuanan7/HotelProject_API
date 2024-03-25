@@ -1,12 +1,12 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
-using Azure;
 using HotelProject_HotelAPI.Models;
 using HotelProject_HotelAPI.Models.DTO;
 using HotelProject_HotelAPI.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Text.Json;
 
 namespace HotelProject_HotelAPI.Controllers.V1
 {
@@ -29,7 +29,7 @@ namespace HotelProject_HotelAPI.Controllers.V1
         [ResponseCache(Duration = 30)]
         [ApiVersion("1.0")]
         public async Task<ActionResult<APIResponse>> GetHotels([FromQuery(Name = "Filter Occupancy")] int? occupancy, 
-            [FromQuery] string? search, int pageSize = 2, int pageNumber =1)
+            [FromQuery] string? search, int pageSize = 0, int pageNumber =1)
         {
             try
             {
@@ -50,6 +50,10 @@ namespace HotelProject_HotelAPI.Controllers.V1
                     search = search.Trim().ToLower();
                     hotels = hotels.Where(h => h.Name.ToLower().Contains(search) || h.Amenity.ToLower().Contains(search));
                 }
+                
+                Pagination pagination = new Pagination() { PageNubmer = pageNumber, PageSize = pageSize};
+                Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(pagination));
+
                 _response.Result = _mapper.Map<List<HotelDTO>>(hotels);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
