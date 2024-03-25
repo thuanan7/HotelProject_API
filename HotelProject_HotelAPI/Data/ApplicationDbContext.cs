@@ -30,7 +30,7 @@ namespace HotelProject_HotelAPI.Data
                     Price = 200,
                     Size = 550,
                     Amenity = "",
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = new DateTime(2024, 03, 25),
                 },
               new Hotel
               {
@@ -42,7 +42,7 @@ namespace HotelProject_HotelAPI.Data
                   Price = 300,
                   Size = 550,
                   Amenity = "",
-                  CreatedDate = DateTime.Now,
+                  CreatedDate = new DateTime(2024, 03, 25),
               },
               new Hotel
               {
@@ -54,7 +54,7 @@ namespace HotelProject_HotelAPI.Data
                   Price = 400,
                   Size = 750,
                   Amenity = "",
-                  CreatedDate = DateTime.Now,
+                  CreatedDate = new DateTime(2024, 03, 25),
               },
               new Hotel
               {
@@ -66,7 +66,7 @@ namespace HotelProject_HotelAPI.Data
                   Price = 550,
                   Size = 900,
                   Amenity = "",
-                  CreatedDate = DateTime.Now,
+                  CreatedDate = new DateTime(2024, 03, 25),
               },
               new Hotel
               {
@@ -78,7 +78,7 @@ namespace HotelProject_HotelAPI.Data
                   Price = 600,
                   Size = 1100,
                   Amenity = "",
-                  CreatedDate = DateTime.Now,
+                  CreatedDate = new DateTime(2024, 03, 25),
               }
               );
         }
