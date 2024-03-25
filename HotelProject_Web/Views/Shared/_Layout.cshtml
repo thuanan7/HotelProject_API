@@ -24,22 +24,44 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Hotel" asp-action="IndexHotel">Hotels</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="HotelRoom" asp-action="IndexHotelRoom">Rooms</a>
-                        </li>
+                        @if (User.IsInRole(SD.Role.Admin))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span>Project Management (Admin)</span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li class="nav-item">
+                                        <a class="dropdown-item text-dark" asp-area="" asp-controller="Hotel" asp-action="IndexHotel">Hotels</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="dropdown-item text-dark" asp-area="" asp-controller="HotelRoom" asp-action="IndexHotelRoom">Rooms</a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Hotel" asp-action="IndexHotel">Hotels</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="HotelRoom" asp-action="IndexHotelRoom">Rooms</a>
+                            </li>
+                        }
 
                         
                     </ul>
                     <ul class="navbar-nav">
-                        @if (httpAccess.HttpContext.Session.GetString(SD.SessionToken) != null &&
-                        httpAccess.HttpContext.Session.GetString(SD.SessionToken).Length > 0)
+                        @if (User.Identity.IsAuthenticated)
                         {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="#">Hello, @User.Identity.Name</a>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Auth" asp-action="Logout">Logout</a>
                             </li>
