@@ -26,12 +26,30 @@ namespace HotelProject_HotelAPI.Controllers.V1
         }
 
         [HttpGet]
+        [ResponseCache(Duration = 30)]
         [ApiVersion("1.0")]
-        public async Task<ActionResult<APIResponse>> GetHotels()
+        public async Task<ActionResult<APIResponse>> GetHotels([FromQuery(Name = "Filter Occupancy")] int? occupancy, 
+            [FromQuery] string? search, int pageSize = 2, int pageNumber =1)
         {
             try
             {
-                var hotels = await _context.GetAllAsync();
+                IEnumerable<Hotel> hotels;
+                if (occupancy > 0)
+                {
+                    //Filter at db
+                    hotels = await _context.GetAllAsync(h => h.Occupancy == occupancy, pageSize:pageSize, pageNumber:pageNumber);
+                }
+                else
+                {
+                    hotels = await _context.GetAllAsync(pageSize: pageSize, pageNumber: pageNumber);
+                }
+
+                //Filter at back-end server after query data from db
+                if (!string.IsNullOrEmpty(search))
+                {
+                    search = search.Trim().ToLower();
+                    hotels = hotels.Where(h => h.Name.ToLower().Contains(search) || h.Amenity.ToLower().Contains(search));
+                }
                 _response.Result = _mapper.Map<List<HotelDTO>>(hotels);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
@@ -47,6 +65,7 @@ namespace HotelProject_HotelAPI.Controllers.V1
         [HttpGet("{id:int}", Name = "GetHotel")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ResponseCache(CacheProfileName = "Default30")]
         public async Task<ActionResult<APIResponse>> GetHotel(int id)
         {
             try
