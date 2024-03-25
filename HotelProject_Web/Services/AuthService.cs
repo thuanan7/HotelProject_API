@@ -19,7 +19,7 @@ namespace HotelProject_Web.Services
             {
                 ApiType = SD.ApiType.POST,
                 Data = objToCreate,
-                Url = hotelApiUrl + "/api/UserAuth/login"
+                Url = hotelApiUrl + "/api/v1/User/login"
             });
         }
 
@@ -29,7 +29,7 @@ namespace HotelProject_Web.Services
             {
                 ApiType = SD.ApiType.POST,
                 Data = objToCreate,
-                Url = hotelApiUrl + "/api/UserAuth/register"
+                Url = hotelApiUrl + "/api/v1/User/register"
             });
         }
     }

@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+using AutoMapper;
 using Azure;
 using HotelProject_HotelAPI.Models;
 using HotelProject_HotelAPI.Models.DTO;
@@ -9,29 +10,33 @@ using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Xml.Linq;
 
-namespace HotelProject_HotelAPI.Controllers
+namespace HotelProject_HotelAPI.Controllers.V1
 {
-    [Route("/api/[controller]")]
+    [Route("/api/v{version:apiVersion}/[controller]")]
     [ApiController]
-    public class HotelApiController : ControllerBase
+    [ApiVersion("1.0")]
+    public class HotelRoomApiController : ControllerBase
     {
-        private readonly IHotelRepository _context;
+        private readonly IHotelRoomRepository _context;
+        private readonly IHotelRepository _hoteldb;
         private readonly IMapper _mapper;
         private APIResponse _response;
-        public HotelApiController(IHotelRepository context, IMapper mapper)
+        public HotelRoomApiController(IHotelRoomRepository context, IMapper mapper, IHotelRepository hoteldb)
         {
             _context = context;
             _mapper = mapper;
             _response = new APIResponse();
+            _hoteldb = hoteldb;
         }
 
         [HttpGet]
-        public async Task<ActionResult<APIResponse>> GetHotels()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponse>> GetHotelRooms()
         {
             try
             {
-                var hotels = await _context.GetAllAsync();
-                _response.Result = _mapper.Map<List<HotelDTO>>(hotels);
+                var hotelRooms = await _context.GetAllAsync(includeProperties: "Hotel");
+                _response.Result = _mapper.Map<List<HotelRoomDTO>>(hotelRooms);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
             }
@@ -43,15 +48,15 @@ namespace HotelProject_HotelAPI.Controllers
             }
         }
 
-        [HttpGet("{id:int}", Name = "GetHotel")]
+        [HttpGet("hotels/{hotelId:int}/rooms/{roomNo}", Name = "GetHotelRoom")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<APIResponse>> GetHotel(int id)
+        public async Task<ActionResult<APIResponse>> GetHotelRoom(int hotelId, int roomNo)
         {
             try
             {
-                var hotel = await _context.GetAsync(h => h.Id == id);
-                if (hotel == null)
+                var hotelRoom = await _context.GetAsync(h => h.HotelId == hotelId && h.RoomNo == roomNo);
+                if (hotelRoom == null)
                 {
                     _response.StatusCode = HttpStatusCode.NotFound;
                     _response.ErrorMessage = "Not Found";
@@ -59,7 +64,7 @@ namespace HotelProject_HotelAPI.Controllers
                     return NotFound(_response);
                 }
                 _response.StatusCode = HttpStatusCode.OK;
-                _response.Result = _mapper.Map<HotelDTO>(hotel);
+                _response.Result = _mapper.Map<HotelRoomDTO>(hotelRoom);
                 return Ok(_response);
             }
             catch (Exception ex)
@@ -74,11 +79,9 @@ namespace HotelProject_HotelAPI.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<APIResponse>> CreateHotel([FromBody] CreateHotelDTO CreateHotelDTO)
+        public async Task<ActionResult<APIResponse>> CreateHotelRoom([FromBody] CreateHotelRoomDTO createHotelRoomDTO)
         {
-            if (CreateHotelDTO == null)
+            if (createHotelRoomDTO == null)
             {
                 _response.StatusCode = HttpStatusCode.BadRequest;
                 _response.ErrorMessage = "Bad Request";
@@ -86,63 +89,70 @@ namespace HotelProject_HotelAPI.Controllers
                 return BadRequest(_response);
             }
 
-            if (await _context.GetAsync(u => u.Name.ToLower() == CreateHotelDTO.Name.ToLower()) != null)
+            if (await _hoteldb.GetAsync(h => h.Id == createHotelRoomDTO.HotelId) == null)
             {
-                ModelState.AddModelError("NameUsedError", "Name Already Exists!");
-                return BadRequest(ModelState);
+                _response.StatusCode = HttpStatusCode.BadRequest;
+                _response.ErrorMessage = "Hotel Doesn't Exits!";
+                _response.IsSuccess = false;
+                return BadRequest(_response);
             }
 
-            var hotel = _mapper.Map<Hotel>(CreateHotelDTO);
-            hotel.CreatedDate = DateTime.Now;
-            await _context.CreateAsync(hotel);
-            
+            var h = await _context.GetAsync(u => u.HotelId == createHotelRoomDTO.HotelId && u.RoomNo == createHotelRoomDTO.RoomNo, tracked: false, includeProperties: "Hotel");
+            if (h != null)
+            {
+                _response.StatusCode = HttpStatusCode.BadRequest;
+                _response.ErrorMessage = $"Room {h.RoomNo} Already Exists in {h.Hotel.Name}!";
+                _response.IsSuccess = false;
+                return BadRequest(_response);
+            }
+
+            var hotelRoom = _mapper.Map<HotelRoom>(createHotelRoomDTO);
+            hotelRoom.CreatedDate = DateTime.Now;
+            await _context.CreateAsync(hotelRoom);
+
             _response.StatusCode = HttpStatusCode.Created;
-            _response.Result = _mapper.Map<HotelDTO>(hotel);
-            return CreatedAtRoute("GetHotel", new { id = hotel.Id }, _response);
+            _response.Result = _mapper.Map<HotelRoomDTO>(hotelRoom);
+            return CreatedAtRoute("GetHotelRoom", new { hotelId = hotelRoom.HotelId, roomNo = hotelRoom.RoomNo }, _response);
         }
 
-        [HttpDelete("{id:int}")]
+        [HttpDelete("hotels/{hotelId:int}/rooms/{roomNo}")]
         [Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> DeleteHotel(int id)
+        public async Task<ActionResult<APIResponse>> DeleteHotelRoom(int hotelId, int roomNo)
         {
-            var hotel = await _context.GetAsync(h => h.Id == id);
-            if (hotel == null)
+            var hotelRoom = await _context.GetAsync(r => r.HotelId == hotelId && r.RoomNo == roomNo);
+            if (hotelRoom == null)
             {
                 _response.StatusCode = HttpStatusCode.NotFound;
                 _response.ErrorMessage = "Not Found";
                 _response.IsSuccess = false;
                 return NotFound(_response);
             }
-            await _context.RemoveAsync(hotel);
+            await _context.RemoveAsync(hotelRoom);
             _response.StatusCode = HttpStatusCode.NoContent;
             return Ok(_response);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("hotels/{hotelId:int}/rooms/{roomNo}")]
         [Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> UpdateHotel(int id, [FromBody] HotelDTO hotelDTO)
+        public async Task<ActionResult<APIResponse>> UpdateHotelRoom(int hotelId, int roomNo, [FromBody] UpdateHotelRoomDTO updateHotelRoomDTO)
         {
-            if (hotelDTO == null || hotelDTO.Id != id)
+            if (updateHotelRoomDTO == null || updateHotelRoomDTO.HotelId != hotelId || updateHotelRoomDTO.RoomNo != roomNo)
             {
                 _response.StatusCode = HttpStatusCode.BadRequest;
                 _response.ErrorMessage = "Bad Request";
-                _response.IsSuccess=false;
+                _response.IsSuccess = false;
                 return BadRequest(_response);
             }
 
-            var hotel = await _context.GetAsync(h => h.Id == id, tracked: false);
-            if (hotel == null)
+            var hotelRoom = await _context.GetAsync(r => r.HotelId == hotelId && r.RoomNo == roomNo, tracked: false);
+            if (hotelRoom == null)
             {
                 _response.StatusCode = HttpStatusCode.NotFound;
                 _response.ErrorMessage = "Not Found";
@@ -150,15 +160,7 @@ namespace HotelProject_HotelAPI.Controllers
                 return NotFound(_response);
             }
 
-            if (await _context.GetAsync(u => u.Id != id && u.Name.ToLower() == hotelDTO.Name.ToLower()) != null)
-            {
-                _response.StatusCode = HttpStatusCode.BadRequest;
-                _response.ErrorMessage = "Name Already Exists!";
-                _response.IsSuccess = false;
-                return BadRequest(_response);
-            }
-
-            var model = _mapper.Map<Hotel>(hotelDTO);
+            var model = _mapper.Map<HotelRoom>(updateHotelRoomDTO);
             await _context.UpdateAsync(model);
             _response.StatusCode = HttpStatusCode.NoContent;
             return Ok(_response);

@@ -1,12 +1,14 @@
-﻿using HotelProject_HotelAPI.Models;
+﻿using Asp.Versioning;
+using HotelProject_HotelAPI.Models;
 using HotelProject_HotelAPI.Models.DTO;
 using HotelProject_HotelAPI.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelProject_HotelAPI.Controllers
 {
-    [Route("api/UserAuth")]
+    [Route("/api/v{version:apiVersion}/[controller]")]
     [ApiController]
+    [ApiVersionNeutral]
     public class UserController : Controller
     {
         private readonly IUserRepository _userRepository;
