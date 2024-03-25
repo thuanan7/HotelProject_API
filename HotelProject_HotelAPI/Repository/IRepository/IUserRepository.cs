@@ -8,6 +8,6 @@ namespace HotelProject_HotelAPI.Repository.IRepository
     {
         bool IsUniqueUser(string username);
         Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO);
-        Task<UserDTO> Register(RegisterRequestDTO registerRequestDTO);
+        Task<RegisterResponseDTO> Register(RegisterRequestDTO registerRequestDTO);
     }
 }

@@ -46,7 +46,16 @@ namespace HotelProject_HotelAPI.Controllers
                 _response.StatusCode = System.Net.HttpStatusCode.BadRequest;
                 return BadRequest(_response);
             }
-            var user = await _userRepository.Register(model);
+            var registerResponse = await _userRepository.Register(model);
+            if (!string.IsNullOrEmpty(registerResponse.ErrorMessage))
+            {
+                _response.ErrorMessage = registerResponse.ErrorMessage;
+                _response.IsSuccess = false;
+                _response.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                return BadRequest(_response);
+            }
+
+            var user = registerResponse.User;
             if (user.ID == null)
             {
                 _response.ErrorMessage = "Error while registering!";

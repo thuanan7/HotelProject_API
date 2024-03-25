@@ -59,7 +59,6 @@ namespace HotelProject_Web.Controllers
         [HttpGet]
         public IActionResult Register()
         {
-            var test = new { Amount = 108, Message = "Hello" };
             var roleSelectListItem = new List<SelectListItem>()
             {
                 new SelectListItem{Text=SD.Role.Admin, Value=SD.Role.Admin},
@@ -73,6 +72,10 @@ namespace HotelProject_Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterRequestDTO obj)
         {
+            if (string.IsNullOrEmpty(obj.Role))
+            {
+                obj.Role = SD.Role.Customer;
+            }
             var response = await _authService.RegisterAsync<APIResponse>(obj);
             if (response != null && response.IsSuccess)
             {
@@ -87,6 +90,12 @@ namespace HotelProject_Web.Controllers
                 ModelState.AddModelError("ErrorMessage", response.ErrorMessage);
             }
             obj.Password = "";
+            var roleSelectListItem = new List<SelectListItem>()
+            {
+                new SelectListItem{Text=SD.Role.Admin, Value=SD.Role.Admin},
+                new SelectListItem{Text=SD.Role.Customer, Value=SD.Role.Customer},
+            };
+            ViewBag.RoleSelectListItem = roleSelectListItem;
             return View(obj);
         }
 

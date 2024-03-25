@@ -9,6 +9,7 @@ using System.Text;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using System.Runtime.InteropServices;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HotelProject_HotelAPI.Repository
 {
@@ -77,7 +78,7 @@ namespace HotelProject_HotelAPI.Repository
             return loginResponseDTO;
         }
 
-        public async Task<UserDTO> Register(RegisterRequestDTO registerRequestDTO)
+        public async Task<RegisterResponseDTO> Register(RegisterRequestDTO registerRequestDTO)
         {
             ApplicationUser user = new()
             {
@@ -86,27 +87,42 @@ namespace HotelProject_HotelAPI.Repository
                 NormalizedEmail = registerRequestDTO.UserName.ToUpper(),
                 Name = registerRequestDTO.Name,
             };
+
             try
             {
                 var result = await _userManager.CreateAsync(user, registerRequestDTO.Password);
                 if (result.Succeeded)
                 {
-                    if (!await _roleManager.RoleExistsAsync("admin"))
+                    if (!await _roleManager.RoleExistsAsync(registerRequestDTO.Role))
                     {
-                        await _roleManager.CreateAsync(new IdentityRole("admin"));
-                        await _roleManager.CreateAsync(new IdentityRole("customer"));
+                        await _roleManager.CreateAsync(new IdentityRole(registerRequestDTO.Role));
                     }
-                    await _userManager.AddToRoleAsync(user, "admin");
+
+                    await _userManager.AddToRoleAsync(user, registerRequestDTO.Role);
                     var userToReturn = _context.ApplicationUsers.FirstOrDefault(u=>u.UserName== registerRequestDTO.UserName);
-                    return _mapper.Map<UserDTO>(userToReturn);
+                    return new RegisterResponseDTO
+                    {
+                        User = _mapper.Map<UserDTO>(userToReturn)
+                    };
+                } 
+                else
+                {
+                    var res = new RegisterResponseDTO
+                    {
+                        User = new UserDTO(),
+                        ErrorMessage = result.Errors.FirstOrDefault().Description
+                    };
+                    return res;
                 }
             }
             catch (Exception ex)
             {
-
+                return new RegisterResponseDTO
+                {
+                    User = new UserDTO(),
+                    ErrorMessage = ex.Message
+                };
             }
-
-            return new UserDTO();
         }
     }
 }
