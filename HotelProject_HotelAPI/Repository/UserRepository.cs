@@ -10,6 +10,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelProject_HotelAPI.Repository
 {
@@ -135,9 +136,53 @@ namespace HotelProject_HotelAPI.Repository
             return tokenStr;
         }
 
-        public Task<TokenDTO> RefreshAccessToken(TokenDTO tokenDTO)
+        public async Task<TokenDTO> RefreshAccessToken(TokenDTO tokenDTO)
         {
-            throw new NotImplementedException();
+            // Find an existing refresh token
+            var existingRefreshToken = await _context.RefreshTokens.FirstOrDefaultAsync(u=>u.Refresh_Token==tokenDTO.RefreshToken);
+            if (existingRefreshToken == null)
+            {
+                return new TokenDTO();
+            }
+            // Compare data from 'existing refresh' and 'access token provided'
+            var accessTokenData = GetAccessTokenData(tokenDTO.AccessToken);
+            if (!accessTokenData.isSuccess || accessTokenData.tokenId != existingRefreshToken.JwtTokenId
+                || accessTokenData.userId != existingRefreshToken.UserId)
+            {
+                existingRefreshToken.IsValid = false;
+                await _context.SaveChangesAsync();
+            }
+
+            // When someone tries to use not valid refresh token, return Fault
+
+            // If expired then mark as invalid and return null
+            if (existingRefreshToken.ExpiresAt < DateTime.UtcNow)
+            {
+                existingRefreshToken.IsValid = false;
+                await _context.SaveChangesAsync();
+            }
+
+            // replace old refresh token with a new one with updated expire date
+            var newRefreshToken = await CreateNewRefreshToken(existingRefreshToken.UserId, existingRefreshToken.JwtTokenId);
+
+            // revoke existing refresh token
+            existingRefreshToken.IsValid = false;
+            await _context.SaveChangesAsync();
+
+            // generate new access token and return token dto
+            var applicationUser = _context.ApplicationUsers.FirstOrDefault(u=>u.Id == existingRefreshToken.UserId);
+            if (applicationUser == null)
+            {
+                return new TokenDTO();
+            }
+
+            var newAccessToken = await GetAccessToken(applicationUser, existingRefreshToken.JwtTokenId);
+
+            return new TokenDTO()
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken,
+            };
         }
 
         private async Task<string> CreateNewRefreshToken(string userId, string tokenId)
