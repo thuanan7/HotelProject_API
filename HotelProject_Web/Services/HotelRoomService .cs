@@ -5,63 +5,60 @@ using HotelProject_Web.Services.IServices;
 
 namespace HotelProject_Web.Services
 {
-    public class HotelRoomService : BaseService, IHotelRoomService
+    public class HotelRoomService : IHotelRoomService
     {
         private string hotelApiUrl;
-        public HotelRoomService(IHttpClientFactory clienFactory, IConfiguration configuration) : base(clienFactory)
+        private readonly IBaseService _baseService;
+        public HotelRoomService(IConfiguration configuration, IBaseService baseService)
         {
             hotelApiUrl = configuration.GetValue<string>("ServiceUrls:HotelProjectAPI");
+            _baseService = baseService;
         }
 
-        public Task<T> CreateAsync<T>(CreateHotelRoomDTO dto, string token)
+        public async Task<T> CreateAsync<T>(CreateHotelRoomDTO dto)
         {
-            return SendAsync<T>(new APIRequest()
+            return await _baseService.SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.POST,
                 Data = dto,
-                Url = hotelApiUrl + $"/api/{SD.CurrentAPIVersion}/HotelRoomApi",
-                Token = token
+                Url = hotelApiUrl + $"/api/{SD.CurrentAPIVersion}/HotelRoomApi"
             });
         }
 
-        public Task<T> DeleteAsync<T>(int hotelId, int roomNo, string token)
+        public async Task<T> DeleteAsync<T>(int hotelId, int roomNo)
         {
-            return SendAsync<T>(new APIRequest()
+            return await _baseService.SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.DELETE,
-                Url = hotelApiUrl + $"/api/{SD.CurrentAPIVersion}/HotelRoomApi/hotels/{hotelId}/rooms/{roomNo}",
-                Token = token
+                Url = hotelApiUrl + $"/api/{SD.CurrentAPIVersion}/HotelRoomApi/hotels/{hotelId}/rooms/{roomNo}"
             });
         }
 
-        public Task<T> GetALlAsync<T>(string token)
+        public async Task<T> GetALlAsync<T>()
         {
-            return SendAsync<T>(new APIRequest()
+            return await _baseService.SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
-                Url = hotelApiUrl + $"/api/{SD.CurrentAPIVersion}/HotelRoomApi",
-                Token = token
+                Url = hotelApiUrl + $"/api/{SD.CurrentAPIVersion}/HotelRoomApi"
             });
         }
 
-        public Task<T> GetAsync<T>(int hotelId, int roomNo, string token)
+        public async Task<T> GetAsync<T>(int hotelId, int roomNo)
         {
-            return SendAsync<T>(new APIRequest()
+            return await _baseService.SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
-                Url = hotelApiUrl + $"/api/{SD.CurrentAPIVersion}/HotelRoomApi/hotels/{hotelId}/rooms/{roomNo}",
-                Token = token
+                Url = hotelApiUrl + $"/api/{SD.CurrentAPIVersion}/HotelRoomApi/hotels/{hotelId}/rooms/{roomNo}"
             });
         }
 
-        public Task<T> UpdateAsync<T>(UpdateHotelRoomDTO dto, string token)
+        public async Task<T> UpdateAsync<T>(UpdateHotelRoomDTO dto)
         {
-            return SendAsync<T>(new APIRequest()
+            return await _baseService.SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.PUT,
                 Data = dto,
-                Url = hotelApiUrl + $"/api/{SD.CurrentAPIVersion}/HotelRoomApi/hotels/{dto.HotelId}/rooms/{dto.RoomNo}",
-                Token = token
+                Url = hotelApiUrl + $"/api/{SD.CurrentAPIVersion}/HotelRoomApi/hotels/{dto.HotelId}/rooms/{dto.RoomNo}"
             });
         }
     }

@@ -10,17 +10,15 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
 builder.Services.AddHttpClient<IHotelService, HotelService>();
-builder.Services.AddScoped<IHotelService, HotelService>();
-
 builder.Services.AddHttpClient<IHotelRoomService, HotelRoomService>();
-builder.Services.AddScoped<IHotelRoomService, HotelRoomService>();
-
 builder.Services.AddHttpClient<IAuthService, AuthService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
 
+builder.Services.AddScoped<IBaseService, BaseService>();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddScoped<IHotelService, HotelService>();
+builder.Services.AddScoped<IHotelRoomService, HotelRoomService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenProvider, TokenProvider>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

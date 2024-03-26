@@ -49,7 +49,7 @@ namespace HotelProject_HotelAPI.Repository
             {
                 return new TokenDTO()
                 {
-                    AcessToken="",
+                    AccessToken="",
                 };
             }
             // gererate JWT Token
@@ -71,7 +71,7 @@ namespace HotelProject_HotelAPI.Repository
             var token = tokenHandle.CreateToken(tokenDescriptor);
             TokenDTO loginResponseDTO = new()
             {
-                AcessToken = tokenHandle.WriteToken(token),
+                AccessToken = tokenHandle.WriteToken(token),
             };
             return loginResponseDTO;
         }
