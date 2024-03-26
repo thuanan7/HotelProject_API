@@ -53,8 +53,9 @@ namespace HotelProject_Web.Controllers
                 {
                     if (response.ErrorMessage != null)
                     {
-                        TempData["error"] = "Error: Something Wrong!";
+                        TempData["error"] = response.ErrorMessage;
                         ModelState.AddModelError("ErrorMessage", response.ErrorMessage);
+                        return View(model);
                     }
                 }
             }
@@ -91,11 +92,13 @@ namespace HotelProject_Web.Controllers
                 {
                     if (response.ErrorMessage != null)
                     {
-                        TempData["error"] = "Error: Something Wrong!";
+                        TempData["error"] = response.ErrorMessage;
                         ModelState.AddModelError("ErrorMessage", response.ErrorMessage);
+                        return View(model);
                     }
                 }
             }
+            TempData["error"] = "Error: Something Wrong!";
             return View(model);
         }
 

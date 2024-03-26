@@ -111,8 +111,10 @@ namespace HotelProject_HotelAPI.Controllers.V2
 
             if (await _context.GetAsync(u => u.Name.ToLower() == createHotelDTO.Name.ToLower()) != null)
             {
-                ModelState.AddModelError("NameUsedError", "Name Already Exists!");
-                return BadRequest(ModelState);
+                _response.StatusCode = HttpStatusCode.BadRequest;
+                _response.ErrorMessage = "Hotel Name Already Exists!";
+                _response.IsSuccess = false;
+                return BadRequest(_response);
             }
 
             var hotel = _mapper.Map<Hotel>(createHotelDTO);
