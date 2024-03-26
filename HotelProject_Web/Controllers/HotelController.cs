@@ -67,7 +67,7 @@ namespace HotelProject_Web.Controllers
             var response = await _hotelService.GetAsync<APIResponse>(HotelId, HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
-                HotelDTO model = JsonConvert.DeserializeObject<HotelDTO>(Convert.ToString(response.Result));
+                UpdateHotelDTO model = JsonConvert.DeserializeObject<UpdateHotelDTO>(Convert.ToString(response.Result));
                 return View(model);
             }
             TempData["error"] = "Error: Something Wrong!";
@@ -77,7 +77,7 @@ namespace HotelProject_Web.Controllers
         [HttpPost]
         [Authorize(Roles = "admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateHotel(HotelDTO model)
+        public async Task<IActionResult> UpdateHotel(UpdateHotelDTO model)
         {
             if (ModelState.IsValid)
             {

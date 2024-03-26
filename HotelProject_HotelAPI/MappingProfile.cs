@@ -12,6 +12,7 @@ namespace HotelProject_HotelAPI
             CreateMap<HotelDTO, Hotel>();
 
             CreateMap<Hotel, CreateHotelDTO>().ReverseMap();
+            CreateMap<Hotel, UpdateHotelDTO>().ReverseMap();
 
             CreateMap<HotelRoom, HotelRoomDTO>().ReverseMap();
             CreateMap<HotelRoom, CreateHotelRoomDTO>().ReverseMap();

@@ -154,7 +154,7 @@ namespace HotelProject_HotelAPI.Controllers.V2
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> UpdateHotel(int id, [FromBody] HotelDTO hotelDTO)
+        public async Task<ActionResult<APIResponse>> UpdateHotel(int id, [FromBody] UpdateHotelDTO hotelDTO)
         {
             if (hotelDTO == null || hotelDTO.Id != id)
             {

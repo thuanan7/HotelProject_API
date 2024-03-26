@@ -54,7 +54,7 @@ namespace HotelProject_Web.Services
             });
         }
 
-        public Task<T> UpdateAsync<T>(HotelDTO dto, string token)
+        public Task<T> UpdateAsync<T>(UpdateHotelDTO dto, string token)
         {
             return SendAsync<T>(new APIRequest()
             {

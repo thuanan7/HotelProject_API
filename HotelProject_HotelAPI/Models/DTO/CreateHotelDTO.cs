@@ -13,6 +13,7 @@ namespace HotelProject_HotelAPI.Models.DTO
         public int Occupancy { get; set; }
         public int Size { get; set; }
         public string ImageUrl { get; set; }
+        public IFormFile Image { get; set; }
         public string Amenity { get; set; }
     }
 }

@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace HotelProject_Web.Models.DTO
+namespace HotelProject_HotelAPI.Models.DTO
 {
-    public class HotelDTO
+    public class UpdateHotelDTO
     {
+        [Required]
         public int Id { get; set; }
         [Required]
         [StringLength(50, MinimumLength = 3)]
@@ -15,6 +16,7 @@ namespace HotelProject_Web.Models.DTO
         public int Size { get; set; }
         public string ImageUrl { get; set; }
         public string ImageLocalpath { get; set; }
+        public IFormFile Image { get; set; }
         public string Amenity { get; set; }
     }
 }

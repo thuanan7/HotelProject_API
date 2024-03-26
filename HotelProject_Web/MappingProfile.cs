@@ -8,6 +8,7 @@ namespace HotelProject_Web
         public MappingProfile()
         {
             CreateMap<HotelDTO, CreateHotelDTO>().ReverseMap();
+            CreateMap<HotelDTO, UpdateHotelDTO>().ReverseMap();
 
             CreateMap<HotelRoomDTO, CreateHotelRoomDTO>().ReverseMap();
             CreateMap<HotelRoomDTO, UpdateHotelRoomDTO>().ReverseMap();
