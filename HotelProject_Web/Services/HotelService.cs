@@ -20,7 +20,8 @@ namespace HotelProject_Web.Services
                 ApiType = SD.ApiType.POST,
                 Data = dto,
                 Url = hotelApiUrl + $"/api/{SD.CurrentAPIVersion}/HotelApi",
-                Token = token
+                Token = token,
+                ContentType = SD.ContentType.MultipartFormData
             });
         }
 
@@ -61,7 +62,8 @@ namespace HotelProject_Web.Services
                 ApiType = SD.ApiType.PUT,
                 Data = dto,
                 Url = hotelApiUrl + $"/api/{SD.CurrentAPIVersion}/HotelApi/{dto.Id}",
-                Token = token
+                Token = token,
+                ContentType = SD.ContentType.MultipartFormData
             });
         }
     }
