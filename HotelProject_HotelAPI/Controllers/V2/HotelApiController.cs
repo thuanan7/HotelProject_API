@@ -171,6 +171,18 @@ namespace HotelProject_HotelAPI.Controllers.V2
                 _response.IsSuccess = false;
                 return NotFound(_response);
             }
+
+            if (!string.IsNullOrEmpty(hotel.ImageLocalPath))
+            {
+                var oldFilePathDirectory = Path.Combine(Directory.GetCurrentDirectory(), hotel.ImageLocalPath);
+                FileInfo file = new FileInfo(oldFilePathDirectory);
+
+                if (file.Exists)
+                {
+                    file.Delete();
+                }
+            }
+
             await _context.RemoveAsync(hotel);
             _response.StatusCode = HttpStatusCode.NoContent;
             return Ok(_response);
@@ -184,9 +196,9 @@ namespace HotelProject_HotelAPI.Controllers.V2
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> UpdateHotel(int id, [FromBody] UpdateHotelDTO hotelDTO)
+        public async Task<ActionResult<APIResponse>> UpdateHotel(int id, [FromForm] UpdateHotelDTO updateHotelDTO)
         {
-            if (hotelDTO == null || hotelDTO.Id != id)
+            if (updateHotelDTO == null || updateHotelDTO.Id != id)
             {
                 _response.StatusCode = HttpStatusCode.BadRequest;
                 _response.ErrorMessage = "Bad Request";
@@ -203,7 +215,7 @@ namespace HotelProject_HotelAPI.Controllers.V2
                 return NotFound(_response);
             }
 
-            if (await _context.GetAsync(u => u.Id != id && u.Name.ToLower() == hotelDTO.Name.ToLower()) != null)
+            if (await _context.GetAsync(u => u.Id != id && u.Name.ToLower() == updateHotelDTO.Name.ToLower()) != null)
             {
                 _response.StatusCode = HttpStatusCode.BadRequest;
                 _response.ErrorMessage = "Name Already Exists!";
@@ -211,7 +223,42 @@ namespace HotelProject_HotelAPI.Controllers.V2
                 return BadRequest(_response);
             }
 
-            var model = _mapper.Map<Hotel>(hotelDTO);
+            var model = _mapper.Map<Hotel>(updateHotelDTO);
+
+            if (updateHotelDTO.Image != null)
+            {
+                if (!string.IsNullOrEmpty(model.ImageLocalPath))
+                {
+                    var oldFilePathDirectory = Path.Combine(Directory.GetCurrentDirectory(), model.ImageLocalPath);
+                    FileInfo file = new FileInfo(oldFilePathDirectory);
+
+                    if (file.Exists)
+                    {
+                        file.Delete();
+                    }
+
+                }
+
+                string fileName = hotel.Id + Path.GetExtension(updateHotelDTO.Image.FileName);
+                string filePath = @"wwwroot\ProductImage\" + fileName;
+
+                var directoryLocation = Path.Combine(Directory.GetCurrentDirectory(), filePath);
+
+
+                using (var fileStream = new FileStream(directoryLocation, FileMode.Create))
+                {
+                    updateHotelDTO.Image.CopyTo(fileStream);
+                }
+
+                var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
+                model.ImageUrl = baseUrl + "/ProductImage/" + fileName;
+                model.ImageLocalPath = filePath;
+            }
+            else
+            {
+                model.ImageUrl = "https://placehold.co/600x400";
+            }
+
             await _context.UpdateAsync(model);
             _response.StatusCode = HttpStatusCode.NoContent;
             return Ok(_response);
