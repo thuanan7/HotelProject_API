@@ -142,7 +142,7 @@ namespace HotelProject_HotelAPI.Repository
 
         private async Task<string> CreateNewRefreshToken(string userId, string tokenId)
         {
-            RefreshToken refreshToekn = new()
+            RefreshToken refreshToken = new()
             {
                 IsValid = true,
                 UserId = userId,
@@ -151,9 +151,9 @@ namespace HotelProject_HotelAPI.Repository
                 Refresh_Token = Guid.NewGuid() + "-" + Guid.NewGuid(),
             };
 
-            await _context.RefreshTokens.AddAsync(refreshToekn);
+            await _context.RefreshTokens.AddAsync(refreshToken);
             await _context.SaveChangesAsync();
-            return refreshToekn.Refresh_Token;
+            return refreshToken.Refresh_Token;
         }
 
         private(bool isSuccess, string userId, string tokenId) GetAccessTokenData(string accessToken)
