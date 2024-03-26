@@ -53,9 +53,12 @@ namespace HotelProject_HotelAPI.Repository
                 };
             }
             
+            var jwtTokenId = $"JTI{Guid.NewGuid()}";
+            var refreshToken = await CreateNewRefreshToken(user.Id, jwtTokenId);
             TokenDTO loginResponseDTO = new()
             {
-                AccessToken = await GetAccessToken(user),
+                AccessToken = await GetAccessToken(user, jwtTokenId),
+                RefreshToken = refreshToken
             };
             return loginResponseDTO;
         }
@@ -107,7 +110,7 @@ namespace HotelProject_HotelAPI.Repository
             }
         }
 
-        private async Task<string> GetAccessToken(ApplicationUser user)
+        private async Task<string> GetAccessToken(ApplicationUser user, string jwtTokenId)
         {
             // gererate JWT Token
             var roles = await _userManager.GetRolesAsync(user);
@@ -119,9 +122,11 @@ namespace HotelProject_HotelAPI.Repository
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, user.UserName.ToString()),
-                    new Claim(ClaimTypes.Role, roles.FirstOrDefault())
+                    new Claim(ClaimTypes.Role, roles.FirstOrDefault()),
+                    new Claim(JwtRegisteredClaimNames.Jti, jwtTokenId),
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Id)
                 }),
-                Expires = DateTime.UtcNow.AddDays(1),
+                Expires = DateTime.UtcNow.AddMinutes(60),
                 SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -133,6 +138,39 @@ namespace HotelProject_HotelAPI.Repository
         public Task<TokenDTO> RefreshAccessToken(TokenDTO tokenDTO)
         {
             throw new NotImplementedException();
+        }
+
+        private async Task<string> CreateNewRefreshToken(string userId, string tokenId)
+        {
+            RefreshToken refreshToekn = new()
+            {
+                IsValid = true,
+                UserId = userId,
+                JwtTokenId = tokenId,
+                ExpiresAt = DateTime.UtcNow.AddDays(1),
+                Refresh_Token = Guid.NewGuid() + "-" + Guid.NewGuid(),
+            };
+
+            await _context.RefreshTokens.AddAsync(refreshToekn);
+            await _context.SaveChangesAsync();
+            return refreshToekn.Refresh_Token;
+        }
+
+        private(bool isSuccess, string userId, string tokenId) GetAccessTokenData(string accessToken)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jwt = tokenHandler.ReadJwtToken(accessToken);
+                var jwtTokenId = jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Jti).Value;
+                var userId = jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Sub).Value;
+
+                return(true, userId, jwtTokenId);
+            }
+            catch 
+            {
+                return (false, null, null);
+            }
         }
     }
 }
