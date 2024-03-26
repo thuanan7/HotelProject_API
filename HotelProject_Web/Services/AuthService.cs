@@ -23,7 +23,7 @@ namespace HotelProject_Web.Services
                 ApiType = SD.ApiType.POST,
                 Data = objToCreate,
                 Url = hotelApiUrl + "/api/User/login"
-            });
+            }, withBearer: false);
         }
 
         public async Task<T> RegisterAsync<T>(RegisterRequestDTO objToCreate)
@@ -33,7 +33,7 @@ namespace HotelProject_Web.Services
                 ApiType = SD.ApiType.POST,
                 Data = objToCreate,
                 Url = hotelApiUrl + "/api/User/register"
-            });
+            }, withBearer: false);
         }
     }
 }

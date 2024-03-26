@@ -52,26 +52,10 @@ namespace HotelProject_HotelAPI.Repository
                     AccessToken="",
                 };
             }
-            // gererate JWT Token
-            var roles = await _userManager.GetRolesAsync(user);
-            var tokenHandle = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(secretKey);
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.UserName.ToString()),
-                    new Claim(ClaimTypes.Role, roles.FirstOrDefault())
-                }),
-                Expires = DateTime.UtcNow.AddDays(1),
-                SigningCredentials= new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var token = tokenHandle.CreateToken(tokenDescriptor);
+            
             TokenDTO loginResponseDTO = new()
             {
-                AccessToken = tokenHandle.WriteToken(token),
+                AccessToken = await GetAccessToken(user),
             };
             return loginResponseDTO;
         }
@@ -121,6 +105,29 @@ namespace HotelProject_HotelAPI.Repository
                     ErrorMessage = ex.Message
                 };
             }
+        }
+
+        private async Task<string> GetAccessToken(ApplicationUser user)
+        {
+            // gererate JWT Token
+            var roles = await _userManager.GetRolesAsync(user);
+            var tokenHandle = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(secretKey);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, user.UserName.ToString()),
+                    new Claim(ClaimTypes.Role, roles.FirstOrDefault())
+                }),
+                Expires = DateTime.UtcNow.AddDays(1),
+                SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandle.CreateToken(tokenDescriptor);
+            var tokenStr = tokenHandle.WriteToken(token);
+            return tokenStr;
         }
     }
 }
