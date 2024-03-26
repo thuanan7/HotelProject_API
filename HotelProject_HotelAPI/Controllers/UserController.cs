@@ -67,5 +67,34 @@ namespace HotelProject_HotelAPI.Controllers
             _response.Result = user;
             return Ok(_response);
         }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> GetNewTokenFromRefreshToken([FromBody] TokenDTO tokenDTO)
+        {
+            if (ModelState.IsValid)
+            {
+                var tokenDTOResponse = await _userRepository.RefreshAccessToken(tokenDTO);
+                if (tokenDTOResponse == null || string.IsNullOrEmpty(tokenDTOResponse.AccessToken))
+                {
+                    _response.ErrorMessage = "Token Invalid";
+                    _response.IsSuccess = false;
+                    _response.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                    return BadRequest(_response);
+                }
+
+                _response.StatusCode = System.Net.HttpStatusCode.OK;
+                _response.IsSuccess = true;
+                _response.Result = tokenDTO;
+                return Ok(_response);
+            }
+            else
+            {
+                _response.ErrorMessage = "Invalid Input";
+                _response.IsSuccess = false;
+                _response.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                return BadRequest(_response);
+            }
+
+        }
     }
 }

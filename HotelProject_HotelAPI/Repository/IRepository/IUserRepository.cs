@@ -9,5 +9,6 @@ namespace HotelProject_HotelAPI.Repository.IRepository
         bool IsUniqueUser(string username);
         Task<TokenDTO> Login(LoginRequestDTO loginRequestDTO);
         Task<RegisterResponseDTO> Register(RegisterRequestDTO registerRequestDTO);
+        Task<TokenDTO> RefreshAccessToken(TokenDTO tokenDTO);
     }
 }

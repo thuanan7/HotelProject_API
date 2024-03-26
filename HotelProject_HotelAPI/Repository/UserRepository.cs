@@ -129,5 +129,10 @@ namespace HotelProject_HotelAPI.Repository
             var tokenStr = tokenHandle.WriteToken(token);
             return tokenStr;
         }
+
+        public Task<TokenDTO> RefreshAccessToken(TokenDTO tokenDTO)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
