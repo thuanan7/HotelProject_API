@@ -26,7 +26,7 @@ namespace HotelProject_HotelAPI.Controllers.V2
         }
 
         [HttpGet]
-        [ResponseCache(Duration = 30)]
+        //[ResponseCache(Duration = 30)]
         public async Task<ActionResult<APIResponse>> GetHotels([FromQuery(Name = "Filter Occupancy")] int? occupancy,
             [FromQuery] string? search, int pageSize = 0, int pageNumber = 1)
         {
@@ -68,7 +68,7 @@ namespace HotelProject_HotelAPI.Controllers.V2
         [HttpGet("{id:int}", Name = "GetHotel")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ResponseCache(CacheProfileName = "Default30")]
+        //[ResponseCache(CacheProfileName = "Default30")]
         public async Task<ActionResult<APIResponse>> GetHotel(int id)
         {
             try
@@ -99,9 +99,9 @@ namespace HotelProject_HotelAPI.Controllers.V2
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<APIResponse>> CreateHotel([FromBody] CreateHotelDTO CreateHotelDTO)
+        public async Task<ActionResult<APIResponse>> CreateHotel([FromForm] CreateHotelDTO createHotelDTO)
         {
-            if (CreateHotelDTO == null)
+            if (createHotelDTO == null)
             {
                 _response.StatusCode = HttpStatusCode.BadRequest;
                 _response.ErrorMessage = "Bad Request";
@@ -109,16 +109,46 @@ namespace HotelProject_HotelAPI.Controllers.V2
                 return BadRequest(_response);
             }
 
-            if (await _context.GetAsync(u => u.Name.ToLower() == CreateHotelDTO.Name.ToLower()) != null)
+            if (await _context.GetAsync(u => u.Name.ToLower() == createHotelDTO.Name.ToLower()) != null)
             {
                 ModelState.AddModelError("NameUsedError", "Name Already Exists!");
                 return BadRequest(ModelState);
             }
 
-            var hotel = _mapper.Map<Hotel>(CreateHotelDTO);
+            var hotel = _mapper.Map<Hotel>(createHotelDTO);
             hotel.CreatedDate = DateTime.Now;
             await _context.CreateAsync(hotel);
 
+            if (createHotelDTO.Image != null)
+            {
+                string fileName = hotel.Id + Path.GetExtension(createHotelDTO.Image.FileName);
+                string filePath = @"wwwroot\ProductImage\" + fileName;
+
+                var directoryLocation = Path.Combine(Directory.GetCurrentDirectory(), filePath);
+
+                FileInfo file = new FileInfo(directoryLocation);
+
+                //For clone Repository sistuation
+                if (file.Exists)
+                {
+                    file.Delete();
+                }
+
+                using (var fileStream = new FileStream(directoryLocation, FileMode.Create))
+                {
+                    createHotelDTO.Image.CopyTo(fileStream);
+                }
+
+                var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
+                hotel.ImageUrl = baseUrl + "/ProductImage/" + fileName;
+                hotel.ImageLocalPath = filePath;
+            }
+            else
+            {
+                hotel.ImageUrl = "https://placehold.co/600x400";
+            }
+
+            await _context.UpdateAsync(hotel);
             _response.StatusCode = HttpStatusCode.Created;
             _response.Result = _mapper.Map<HotelDTO>(hotel);
             return CreatedAtRoute("GetHotel", new { id = hotel.Id }, _response);

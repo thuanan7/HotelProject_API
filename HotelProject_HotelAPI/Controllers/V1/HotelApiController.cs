@@ -26,7 +26,7 @@ namespace HotelProject_HotelAPI.Controllers.V1
         }
 
         [HttpGet]
-        [ResponseCache(Duration = 30)]
+        //[ResponseCache(Duration = 30)]
         [ApiVersion("1.0")]
         public async Task<ActionResult<APIResponse>> GetHotels([FromQuery(Name = "Filter Occupancy")] int? occupancy, 
             [FromQuery] string? search, int pageSize = 0, int pageNumber =1)
@@ -69,7 +69,7 @@ namespace HotelProject_HotelAPI.Controllers.V1
         [HttpGet("{id:int}", Name = "GetHotel")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ResponseCache(CacheProfileName = "Default30")]
+        //[ResponseCache(CacheProfileName = "Default30")]
         public async Task<ActionResult<APIResponse>> GetHotel(int id)
         {
             try
