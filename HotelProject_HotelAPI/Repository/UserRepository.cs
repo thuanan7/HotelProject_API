@@ -127,7 +127,7 @@ namespace HotelProject_HotelAPI.Repository
                     new Claim(JwtRegisteredClaimNames.Jti, jwtTokenId),
                     new Claim(JwtRegisteredClaimNames.Sub, user.Id)
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(60),
+                Expires = DateTime.UtcNow.AddMinutes(30),
                 SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -151,15 +151,26 @@ namespace HotelProject_HotelAPI.Repository
             {
                 existingRefreshToken.IsValid = false;
                 await _context.SaveChangesAsync();
+                return new TokenDTO();
             }
 
-            // When someone tries to use not valid refresh token, return Fault
+            // When someone tries to use not valid refresh token, security situation possible
+            if (!existingRefreshToken.IsValid)
+            {
+                await _context.RefreshTokens.Where(u => u.UserId == existingRefreshToken.UserId
+                                            && u.JwtTokenId == existingRefreshToken.JwtTokenId)
+                    .ExecuteUpdateAsync(u=>u.SetProperty(refreshToken=>refreshToken.IsValid, false));
+
+                return new TokenDTO();
+            }
+            
 
             // If expired then mark as invalid and return null
             if (existingRefreshToken.ExpiresAt < DateTime.UtcNow)
             {
                 existingRefreshToken.IsValid = false;
                 await _context.SaveChangesAsync();
+                return new TokenDTO();
             }
 
             // replace old refresh token with a new one with updated expire date
@@ -192,7 +203,7 @@ namespace HotelProject_HotelAPI.Repository
                 IsValid = true,
                 UserId = userId,
                 JwtTokenId = tokenId,
-                ExpiresAt = DateTime.UtcNow.AddDays(1),
+                ExpiresAt = DateTime.UtcNow.AddMinutes(60),
                 Refresh_Token = Guid.NewGuid() + "-" + Guid.NewGuid(),
             };
 
