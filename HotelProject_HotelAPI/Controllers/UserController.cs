@@ -22,8 +22,8 @@ namespace HotelProject_HotelAPI.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO model)
         {
-            var loginResponse = await _userRepository.Login(model);
-            if (loginResponse.User == null || string.IsNullOrEmpty(loginResponse.Token))
+            var tokenDTO = await _userRepository.Login(model);
+            if (tokenDTO == null || string.IsNullOrEmpty(tokenDTO.Token))
             {
                 _response.ErrorMessage = "Username or password is incorrect";
                 _response.IsSuccess = false;
@@ -31,7 +31,7 @@ namespace HotelProject_HotelAPI.Controllers
                 return BadRequest(_response);
             }
             _response.StatusCode = System.Net.HttpStatusCode.OK;
-            _response.Result = loginResponse;
+            _response.Result = tokenDTO;
             return Ok(_response);
         }
 

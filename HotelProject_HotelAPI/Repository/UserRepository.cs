@@ -39,7 +39,7 @@ namespace HotelProject_HotelAPI.Repository
             return false;
         }
 
-        public async Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO)
+        public async Task<TokenDTO> Login(LoginRequestDTO loginRequestDTO)
         {
             var user = _context.ApplicationUsers.FirstOrDefault(u => u.UserName.ToLower() == loginRequestDTO.UserName.ToLower());
 
@@ -47,10 +47,9 @@ namespace HotelProject_HotelAPI.Repository
 
             if (user == null || !isValid)
             {
-                return new LoginResponseDTO()
+                return new TokenDTO()
                 {
                     Token="",
-                    User = null
                 };
             }
             // gererate JWT Token
@@ -70,10 +69,9 @@ namespace HotelProject_HotelAPI.Repository
             };
 
             var token = tokenHandle.CreateToken(tokenDescriptor);
-            LoginResponseDTO loginResponseDTO = new()
+            TokenDTO loginResponseDTO = new()
             {
                 Token = tokenHandle.WriteToken(token),
-                User = _mapper.Map<UserDTO>(user),
             };
             return loginResponseDTO;
         }

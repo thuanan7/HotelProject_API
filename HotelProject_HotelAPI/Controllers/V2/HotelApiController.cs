@@ -258,7 +258,10 @@ namespace HotelProject_HotelAPI.Controllers.V2
             }
             else
             {
-                model.ImageUrl = "https://placehold.co/600x400";
+                if (string.IsNullOrEmpty(model.ImageLocalPath))
+                {
+                    model.ImageUrl = "https://placehold.co/600x400";
+                }
             }
 
             await _context.UpdateAsync(model);

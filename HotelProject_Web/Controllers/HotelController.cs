@@ -22,7 +22,7 @@ namespace HotelProject_Web.Controllers
         public async Task<IActionResult> IndexHotel()
         {
             List<HotelDTO> list = new();
-            var response = await _hotelService.GetALlAsync<APIResponse>(HttpContext.Session.GetString(SD.AccessToken));
+            var response = await _hotelService.GetALlAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 list = JsonConvert.DeserializeObject<List<HotelDTO>>(Convert.ToString(response.Result));
@@ -43,7 +43,7 @@ namespace HotelProject_Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await _hotelService.CreateAsync<APIResponse>(model, HttpContext.Session.GetString(SD.AccessToken));
+                var response = await _hotelService.CreateAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionToken));
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Hotel created successfully";
@@ -65,7 +65,7 @@ namespace HotelProject_Web.Controllers
 
         public async Task<IActionResult> UpdateHotel(int HotelId)
         {
-            var response = await _hotelService.GetAsync<APIResponse>(HotelId, HttpContext.Session.GetString(SD.AccessToken));
+            var response = await _hotelService.GetAsync<APIResponse>(HotelId, HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 UpdateHotelDTO model = JsonConvert.DeserializeObject<UpdateHotelDTO>(Convert.ToString(response.Result));
@@ -82,7 +82,7 @@ namespace HotelProject_Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await _hotelService.UpdateAsync<APIResponse>(model, HttpContext.Session.GetString(SD.AccessToken));
+                var response = await _hotelService.UpdateAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionToken));
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Hotel Updated successfully";
@@ -104,7 +104,7 @@ namespace HotelProject_Web.Controllers
 
         public async Task<IActionResult> DeleteHotel(int HotelId)
         {
-            var response = await _hotelService.GetAsync<APIResponse>(HotelId, HttpContext.Session.GetString(SD.AccessToken));
+            var response = await _hotelService.GetAsync<APIResponse>(HotelId, HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 HotelDTO model = JsonConvert.DeserializeObject<HotelDTO>(Convert.ToString(response.Result));
@@ -120,7 +120,7 @@ namespace HotelProject_Web.Controllers
         public async Task<IActionResult> DeleteHotel(HotelDTO model)
         {
 
-            var response = await _hotelService.DeleteAsync<APIResponse>(model.Id, HttpContext.Session.GetString(SD.AccessToken));
+            var response = await _hotelService.DeleteAsync<APIResponse>(model.Id, HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 TempData["success"] = "Hotel deleted successfully";
