@@ -46,7 +46,7 @@ namespace HotelProject_Web.Controllers
                 var principal = new ClaimsPrincipal(identity);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-                HttpContext.Session.SetString(SD.SessionToken, model.Token);
+                HttpContext.Session.SetString(SD.AccessToken, model.Token);
                 return RedirectToAction("Index", "Home");
             }
 
@@ -102,7 +102,7 @@ namespace HotelProject_Web.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync();
-            HttpContext.Session.SetString(SD.SessionToken, string.Empty);
+            HttpContext.Session.SetString(SD.AccessToken, string.Empty);
             return RedirectToAction("Index", "Home");
         }
 

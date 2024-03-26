@@ -6,7 +6,7 @@
         {
             GET, POST, PUT, DELETE
         }
-        public static string SessionToken = "JWTToken";
+        public static string AccessToken = "JWTToken";
         public static string CurrentAPIVersion = "v2";
         
         public static class Role
