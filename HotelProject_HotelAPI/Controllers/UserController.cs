@@ -68,6 +68,22 @@ namespace HotelProject_HotelAPI.Controllers
             return Ok(_response);
         }
 
+        [HttpPost("revoke")]
+        public async Task<IActionResult> RevokeRefreshToken([FromBody] TokenDTO tokenDTO)
+        {
+            if (ModelState.IsValid)
+            {
+                await _userRepository.RevokeRefreshToken(tokenDTO);
+                _response.IsSuccess = true;
+                _response.StatusCode = System.Net.HttpStatusCode.OK;
+                return Ok(_response);
+            }
+            _response.IsSuccess = false;
+            _response.StatusCode = System.Net.HttpStatusCode.BadRequest;
+            _response.ErrorMessage = "Invalid Input";
+            return BadRequest(_response);
+        }
+
         [HttpPost("refresh")]
         public async Task<IActionResult> GetNewTokenFromRefreshToken([FromBody] TokenDTO tokenDTO)
         {

@@ -6,5 +6,6 @@ namespace HotelProject_Web.Services.IServices
     {
         Task<T> LoginAsync<T>(LoginRequestDTO objToCreate);
         Task<T> RegisterAsync<T>(RegisterRequestDTO objToCreate);
+        Task<T> LogoutAsync<T>(TokenDTO obj);
     }
 }

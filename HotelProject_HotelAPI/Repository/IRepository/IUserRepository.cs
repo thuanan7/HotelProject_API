@@ -10,5 +10,7 @@ namespace HotelProject_HotelAPI.Repository.IRepository
         Task<TokenDTO> Login(LoginRequestDTO loginRequestDTO);
         Task<RegisterResponseDTO> Register(RegisterRequestDTO registerRequestDTO);
         Task<TokenDTO> RefreshAccessToken(TokenDTO tokenDTO);
+
+        Task RevokeRefreshToken(TokenDTO tokenDTO);
     }
 }
