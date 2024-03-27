@@ -127,7 +127,7 @@ namespace HotelProject_HotelAPI.Repository
                     new Claim(JwtRegisteredClaimNames.Jti, jwtTokenId),
                     new Claim(JwtRegisteredClaimNames.Sub, user.Id)
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(30),
+                Expires = DateTime.UtcNow.AddMinutes(1),
                 SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -203,7 +203,7 @@ namespace HotelProject_HotelAPI.Repository
                 IsValid = true,
                 UserId = userId,
                 JwtTokenId = tokenId,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(60),
+                ExpiresAt = DateTime.UtcNow.AddMinutes(5),
                 Refresh_Token = Guid.NewGuid() + "-" + Guid.NewGuid(),
             };
 

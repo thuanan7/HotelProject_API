@@ -1,7 +1,6 @@
 ﻿using HotelProject_Utility;
 using HotelProject_Web.Models;
 using HotelProject_Web.Models.DTO;
-using HotelProject_Web.Services;
 using HotelProject_Web.Services.IServices;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
