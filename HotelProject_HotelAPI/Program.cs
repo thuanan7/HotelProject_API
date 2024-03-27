@@ -9,6 +9,8 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Identity;
 using HotelProject_HotelAPI.Models;
+using HotelProject_HotelAPI.Filters;
+using HotelProject_HotelAPI.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,11 +62,7 @@ builder.Services.AddAuthentication(x =>
 
 builder.Services.AddControllers(option =>
 {
-    //option.CacheProfiles.Add("Default30",
-    //    new Microsoft.AspNetCore.Mvc.CacheProfile()
-    //    {
-    //        Duration = 30
-    //    });
+    option.Filters.Add<CustomExceptionFilter>();
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -136,7 +134,8 @@ else
     });
 }
 
-app.UseExceptionHandler("/ErrorHandling/ProcessError");
+//app.UseExceptionHandler("/ErrorHandling/ProcessError");
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseStaticFiles();
 
