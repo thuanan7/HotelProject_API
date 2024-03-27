@@ -23,7 +23,7 @@ namespace HotelProject_HotelAPI.Repository
         private readonly string secretKey;
         private readonly int _accessTokenTimeExpires = 1;
         private readonly int _refreshTokenTimeExpires = 2;
-        public UserRepository(ApplicationDbContext context, IMapper mapper, IConfiguration configuration, 
+        public UserRepository(ApplicationDbContext context, IMapper mapper, IConfiguration configuration,
             UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
@@ -34,7 +34,7 @@ namespace HotelProject_HotelAPI.Repository
         }
         public bool IsUniqueUser(string username)
         {
-            var user = _context.ApplicationUsers.FirstOrDefault(u=> u.UserName == username);
+            var user = _context.ApplicationUsers.FirstOrDefault(u => u.UserName == username);
             if (user == null)
             {
                 return true;
@@ -52,10 +52,10 @@ namespace HotelProject_HotelAPI.Repository
             {
                 return new TokenDTO()
                 {
-                    AccessToken="",
+                    AccessToken = "",
                 };
             }
-            
+
             var jwtTokenId = $"JTI{Guid.NewGuid()}";
             var refreshToken = await CreateNewRefreshToken(user.Id, jwtTokenId);
             TokenDTO loginResponseDTO = new()
@@ -87,12 +87,12 @@ namespace HotelProject_HotelAPI.Repository
                     }
 
                     await _userManager.AddToRoleAsync(user, registerRequestDTO.Role);
-                    var userToReturn = _context.ApplicationUsers.FirstOrDefault(u=>u.UserName== registerRequestDTO.UserName);
+                    var userToReturn = _context.ApplicationUsers.FirstOrDefault(u => u.UserName == registerRequestDTO.UserName);
                     return new RegisterResponseDTO
                     {
                         User = _mapper.Map<UserDTO>(userToReturn)
                     };
-                } 
+                }
                 else
                 {
                     var res = new RegisterResponseDTO
@@ -141,37 +141,33 @@ namespace HotelProject_HotelAPI.Repository
         public async Task<TokenDTO> RefreshAccessToken(TokenDTO tokenDTO)
         {
             // Find an existing refresh token
-            var existingRefreshToken = await _context.RefreshTokens.FirstOrDefaultAsync(u=>u.Refresh_Token==tokenDTO.RefreshToken);
+            var existingRefreshToken = await _context.RefreshTokens.FirstOrDefaultAsync(u => u.Refresh_Token == tokenDTO.RefreshToken);
             if (existingRefreshToken == null)
             {
                 return new TokenDTO();
             }
+
             // Compare data from 'existing refresh' and 'access token provided'
-            var accessTokenData = GetAccessTokenData(tokenDTO.AccessToken);
-            if (!accessTokenData.isSuccess || accessTokenData.tokenId != existingRefreshToken.JwtTokenId
-                || accessTokenData.userId != existingRefreshToken.UserId)
+            var isTokenValid = CheckAccessTokenData(tokenDTO.AccessToken, existingRefreshToken.UserId, existingRefreshToken.JwtTokenId);
+            if (!isTokenValid)
             {
-                existingRefreshToken.IsValid = false;
-                await _context.SaveChangesAsync();
+                await MarkTokenAsInvalid(existingRefreshToken);
                 return new TokenDTO();
             }
 
             // When someone tries to use not valid refresh token, security situation possible
             if (!existingRefreshToken.IsValid)
             {
-                await _context.RefreshTokens.Where(u => u.UserId == existingRefreshToken.UserId
-                                            && u.JwtTokenId == existingRefreshToken.JwtTokenId)
-                    .ExecuteUpdateAsync(u=>u.SetProperty(refreshToken=>refreshToken.IsValid, false));
+                await MarkAllTokenInChainAsInvalid(existingRefreshToken.UserId, existingRefreshToken.JwtTokenId);
 
                 return new TokenDTO();
             }
-            
+
 
             // If expired then mark as invalid and return null
             if (existingRefreshToken.ExpiresAt < DateTime.UtcNow)
             {
-                existingRefreshToken.IsValid = false;
-                await _context.SaveChangesAsync();
+                await MarkTokenAsInvalid(existingRefreshToken);
                 return new TokenDTO();
             }
 
@@ -183,7 +179,7 @@ namespace HotelProject_HotelAPI.Repository
             await _context.SaveChangesAsync();
 
             // generate new access token and return token dto
-            var applicationUser = _context.ApplicationUsers.FirstOrDefault(u=>u.Id == existingRefreshToken.UserId);
+            var applicationUser = _context.ApplicationUsers.FirstOrDefault(u => u.Id == existingRefreshToken.UserId);
             if (applicationUser == null)
             {
                 return new TokenDTO();
@@ -214,7 +210,8 @@ namespace HotelProject_HotelAPI.Repository
             return refreshToken.Refresh_Token;
         }
 
-        private(bool isSuccess, string userId, string tokenId) GetAccessTokenData(string accessToken)
+        private bool CheckAccessTokenData(string accessToken, string expectedUserId,
+            string expectedTokenId)
         {
             try
             {
@@ -223,12 +220,24 @@ namespace HotelProject_HotelAPI.Repository
                 var jwtTokenId = jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Jti).Value;
                 var userId = jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Sub).Value;
 
-                return(true, userId, jwtTokenId);
+                return userId == expectedUserId && jwtTokenId == expectedTokenId;
             }
-            catch 
+            catch
             {
-                return (false, null, null);
+                return false;
             }
+        }
+
+        private async Task MarkAllTokenInChainAsInvalid(string userId, string tokenId)
+        {
+            await _context.RefreshTokens.Where(u => u.UserId == userId && u.JwtTokenId == tokenId)
+                    .ExecuteUpdateAsync(u => u.SetProperty(refreshToken => refreshToken.IsValid, false));
+        }
+
+        private Task MarkTokenAsInvalid(RefreshToken refreshToken)
+        {
+            refreshToken.IsValid = false;
+            return _context.SaveChangesAsync();
         }
     }
 }
