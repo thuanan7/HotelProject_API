@@ -117,17 +117,26 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
-
+app.UseSwagger();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
     app.UseSwaggerUI(options=>
     {
         options.SwaggerEndpoint("/swagger/v2/swagger.json", "HotelProject_V2");
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "HotelProject_V1");
     });
 }
+else
+{
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v2/swagger.json", "HotelProject_V2");
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "HotelProject_V1");
+    });
+}
+
+app.UseExceptionHandler("/ErrorHandling/ProcessError");
 
 app.UseStaticFiles();
 
@@ -136,5 +145,26 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
+ApplyMigration();
 app.Run();
+
+void ApplyMigration()
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        try
+        {
+            var context = services.GetRequiredService<ApplicationDbContext>();
+            if (context.Database.GetPendingMigrations().Any())
+            {
+                context.Database.Migrate();
+            }
+        }
+        catch (Exception ex)
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error occurred while migrating the database.");
+        }
+    }
+}
