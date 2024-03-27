@@ -103,7 +103,7 @@ namespace HotelProject_Web.Services
                 {
                     IsSuccess = false,
                 };
-                                
+
                 try
                 {
                     switch (httpResponseMessage.StatusCode)
@@ -135,6 +135,10 @@ namespace HotelProject_Web.Services
                 var returnObj = JsonConvert.DeserializeObject<T>(res);
                 return returnObj;
             }
+            catch (AuthException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 var dto = new APIResponse
@@ -146,7 +150,7 @@ namespace HotelProject_Web.Services
                 var APIResponse = JsonConvert.DeserializeObject<T>(res);
                 return APIResponse;
             }
-            
+
         }
 
         private async Task<HttpResponseMessage> SendWithRefreshTokenAsync(HttpClient httpClient,
@@ -178,6 +182,10 @@ namespace HotelProject_Web.Services
                 }
                 return response;
             }
+            catch (AuthException)
+            {
+                throw;
+            }
             catch (HttpRequestException httpRequestException)
             {
                 if (httpRequestException.StatusCode == System.Net.HttpStatusCode.Unauthorized)
@@ -206,6 +214,7 @@ namespace HotelProject_Web.Services
             {
                 await _httpContextAccessor.HttpContext.SignOutAsync();
                 _tokenProvider.ClearToken();
+                throw new AuthException();
             }
             else
             {
