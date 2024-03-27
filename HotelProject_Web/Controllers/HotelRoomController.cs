@@ -66,7 +66,7 @@ namespace HotelProject_Web.Controllers
                 {
                     if (response.ErrorMessage != null)
                     {
-                        TempData["error"] = "Error: Something Wrong!";
+                        TempData["error"] = response.ErrorMessage;
                         ModelState.AddModelError("ErrorMessage", response.ErrorMessage);
                     }
                 }
@@ -129,7 +129,7 @@ namespace HotelProject_Web.Controllers
                 {
                     if (response.ErrorMessage != null)
                     {
-                        TempData["error"] = "Error: Something Wrong!";
+                        TempData["error"] = response.ErrorMessage;
                         ModelState.AddModelError("ErrorMessage", response.ErrorMessage);
                     }
                 }
@@ -185,7 +185,14 @@ namespace HotelProject_Web.Controllers
                 TempData["success"] = "Hotel deleted successfully";
                 return RedirectToAction(nameof(IndexHotelRoom));
             }
-            TempData["error"] = "Error: Something Wrong!";
+            else
+            {
+                if (response.ErrorMessage != null)
+                {
+                    TempData["error"] = response.ErrorMessage;
+                    ModelState.AddModelError("ErrorMessage", response.ErrorMessage);
+                }
+            }
             return View(model);
         }
     }

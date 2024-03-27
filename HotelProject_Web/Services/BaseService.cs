@@ -97,34 +97,43 @@ namespace HotelProject_Web.Services
                     return message;
                 };
 
-                HttpResponseMessage apiResponse = await SendWithRefreshTokenAsync(client, messageFactory, withBearer);
+                HttpResponseMessage httpResponseMessage = await SendWithRefreshTokenAsync(client, messageFactory, withBearer);
+
+                APIResponse finalApiResponse = new()
+                {
+                    IsSuccess = false,
+                };
                                 
-                var apiContent = await apiResponse.Content.ReadAsStringAsync();
                 try
                 {
-                    APIResponse APIResponse = JsonConvert.DeserializeObject<APIResponse>(apiContent);
-                    if (APIResponse == null) 
+                    switch (httpResponseMessage.StatusCode)
                     {
-                        APIResponse = new APIResponse();
-                        APIResponse.ErrorMessage = "Error: Something Wrong!";
-                        APIResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
-                        APIResponse.IsSuccess = false;
+                        case System.Net.HttpStatusCode.NotFound:
+                            finalApiResponse.ErrorMessage = "Not Found";
+                            break;
+                        case System.Net.HttpStatusCode.Forbidden:
+                            finalApiResponse.ErrorMessage = "Access Denied";
+                            break;
+                        case System.Net.HttpStatusCode.Unauthorized:
+                            finalApiResponse.ErrorMessage = "Unauthorized";
+                            break;
+                        case System.Net.HttpStatusCode.InternalServerError:
+                            finalApiResponse.ErrorMessage = "Internal Server Error";
+                            break;
+                        default:
+                            var apiContent = await httpResponseMessage.Content.ReadAsStringAsync();
+                            finalApiResponse = JsonConvert.DeserializeObject<APIResponse>(apiContent);
+                            finalApiResponse.IsSuccess = true;
+                            break;
                     }
-                    else if (APIResponse.StatusCode == System.Net.HttpStatusCode.BadRequest
-                        || APIResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
-                    {
-                        APIResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
-                        APIResponse.IsSuccess = false;
-                    }
-                    var res = JsonConvert.SerializeObject(APIResponse);
-                    var returnObj = JsonConvert.DeserializeObject<T>(res);
-                    return returnObj;
                 }
-                catch
+                catch (Exception ex)
                 {
-                    var exceptionResponse = JsonConvert.DeserializeObject<T>(apiContent);
-                    return exceptionResponse;
+                    finalApiResponse.ErrorMessage = ex.Message;
                 }
+                var res = JsonConvert.SerializeObject(finalApiResponse);
+                var returnObj = JsonConvert.DeserializeObject<T>(res);
+                return returnObj;
             }
             catch (Exception ex)
             {
@@ -137,6 +146,7 @@ namespace HotelProject_Web.Services
                 var APIResponse = JsonConvert.DeserializeObject<T>(res);
                 return APIResponse;
             }
+            
         }
 
         private async Task<HttpResponseMessage> SendWithRefreshTokenAsync(HttpClient httpClient,

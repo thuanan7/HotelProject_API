@@ -21,6 +21,8 @@ namespace HotelProject_HotelAPI.Repository
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IMapper _mapper;
         private readonly string secretKey;
+        private readonly int _accessTokenTimeExpires = 1;
+        private readonly int _refreshTokenTimeExpires = 2;
         public UserRepository(ApplicationDbContext context, IMapper mapper, IConfiguration configuration, 
             UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
@@ -127,7 +129,7 @@ namespace HotelProject_HotelAPI.Repository
                     new Claim(JwtRegisteredClaimNames.Jti, jwtTokenId),
                     new Claim(JwtRegisteredClaimNames.Sub, user.Id)
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(1),
+                Expires = DateTime.UtcNow.AddMinutes(_accessTokenTimeExpires),
                 SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -203,7 +205,7 @@ namespace HotelProject_HotelAPI.Repository
                 IsValid = true,
                 UserId = userId,
                 JwtTokenId = tokenId,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(5),
+                ExpiresAt = DateTime.UtcNow.AddMinutes(_refreshTokenTimeExpires),
                 Refresh_Token = Guid.NewGuid() + "-" + Guid.NewGuid(),
             };
 
